@@ -1,5 +1,5 @@
 require_relative 'metadata'
 
 each_package do |name|
-  `cd ../#{name}; npm install;`
+  system "cd ../#{name}; npm install;"
 end
