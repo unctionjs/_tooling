@@ -1,0 +1,2 @@
+  - [ ] Update .npmignore to include coverage + .nyc_output
+  - [ ] Move gitignore .nyc_output + coverage to temporary files section

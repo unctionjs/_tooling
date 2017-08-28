@@ -4,8 +4,14 @@ REPOSITORIES = JSON.parse(`curl https://api.github.com/orgs/unctionjs/repos\?per
 PACKAGES = REPOSITORIES.reject { |name| name.include?("_") }
 METAPACKAGES = REPOSITORIES.select { |name| name.include?("_") }
 
-def each_package
-  PACKAGES.each do |name|
+def each_package(template: false)
+  packages = if template
+    (PACKAGES + ["_template"])
+  else
+    PACKAGES
+  end
+
+  packages.each do |name|
     puts "Working on #{name}..."
     yield(name)
   end

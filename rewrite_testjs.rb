@@ -1,9 +1,9 @@
 require_relative 'metadata'
 
-each_package do |name|
+each_package(template: true) do |name|
   location = File.join(ENV["HOME"], "Code", "unctionjs", name, "test.js")
   old = File.read(location)
-  updated = old.gsub("import  from \"./source\"", "import #{name} from \"./source\"")
+  updated = old.gsub("from \"./\"", "from \"./index\"")
 
   File.write(location, updated)
 end
