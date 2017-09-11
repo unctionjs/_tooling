@@ -50,7 +50,7 @@ import {hammer} from "@unction/complete"
 See below for each function's documentation or their individual github readmes.
 README
 
-each_package(complete: false) do |name|
+each_package(complete: false, template: false) do |name|
   readme_location = File.join(ENV["HOME"], "Code", "unctionjs", name, "README.md")
   package_location = File.join(ENV["HOME"], "Code", "unctionjs", name, "package.json")
   package = JSON.parse(File.read(package_location))

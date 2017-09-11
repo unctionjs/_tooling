@@ -12,7 +12,7 @@ when "match"
     location = File.join(ENV["HOME"], "Code", "unctionjs", name, "package.json")
     file = File.read(location)
     package = JSON.parse(file)
-    dependencies = (package["dependencies"] || {}).merge(package["devDependencies"] || {}).keys.select { |key| key.match?(partial) }
+    dependencies = (package["dependencies"] || {}).merge(package["devDependencies"] || {}).keys.select { |key| key =~ partial }
 
     system "cd ../#{name}; npm install --save #{dependencies.map {|dependency| "#{dependency}@latest"}.join(" ")}"
   end

@@ -6,10 +6,10 @@ name = gets.chomp
 root = File.join(ENV["HOME"], "Code", "unctionjs", name)
 
 system [
-  "hub clone unctionjs/_tempLate #{root}",
+  "cd ../",
+  "git clone git://github.com/unctionjs/_tempLate.git #{root}",
   "cd #{root}",
   "git remote set-url origin git@github.com:unctionjs/#{name}.git",
-  "hub create unctionjs/#{name}",
   "git submodule update --init"
 ].join("; ")
 
@@ -25,7 +25,7 @@ updated = old.gsub("{{NAME}}", name).gsub("{{FQNAME}}", name.downcase)
 
 File.write(location, updated)
 
-location = File.join(root, "source.js")
+location = File.join(root, "index.js")
 old = File.read(location)
 updated = old.gsub("{{NAME}}", name).gsub("{{FQNAME}}", name.downcase)
 

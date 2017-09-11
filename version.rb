@@ -1,7 +1,12 @@
 require_relative './metadata'
 
+print "Do you want to bump to [patch], [minor], or [major]? "
+level = gets.chomp
+
 each_package do |name|
-  puts "Level:"
-  level = gets.chomp
-  system "cd ../#{name}; npm version #{level}"
+  if different_from_latest_version?(name)
+    system "cd ../#{name}; npm version #{level}"
+  else
+    puts "No changes"
+  end
 end

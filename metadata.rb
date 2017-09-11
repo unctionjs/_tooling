@@ -1,39 +1,37 @@
 require 'json'
 
-REPOSITORIES = JSON.parse(`curl https://api.github.com/orgs/unctionjs/repos\?per_page=1000`).map { |repository| repository["name"] }
-PACKAGES = REPOSITORIES.reject { |name| name.include?("_") || name == "unctionjs.github.io" || name == "complete" }
-METAPACKAGES = REPOSITORIES.select { |name| name.include?("_") || name == "unctionjs.github.io" }
+PACKAGES = File.read("PACKAGES").split("\n")
+METAPACKAGES = File.read("METAPACKAGES").split("\n")
 
-def each_package(template: false, complete: true)
+def different_from_latest_version?(name)
+  `cd ../#{name}; git diff HEAD..#{latest_version(name)}` != ""
+end
+
+def latest_version(name)
+  `cd ../#{name}; git tag`.split("\n").sort_by { |version| version.gsub("v", "").split(".").map(&:to_i) }.last
+end
+
+def each_repository()
+  (PACKAGES + METAPACKAGES).each do |name|
+    puts "Working on #{name}..."
+    yield(name)
+  end
+  puts "Done"
+end
+
+def each_package()
   PACKAGES.each do |name|
     puts "Working on #{name}..."
     yield(name)
   end
-
-  if complete
-    puts "Working on complete..."
-    yield("complete")
-  end
-
-  if template
-    puts "Working on _template..."
-    yield("_template")
-  end
   puts "Done"
 end
 
-def each_repository
-  REPOSITORIES.each do |name|
+def each_metapackage()
+  METAPACKAGE.each do |name|
     puts "Working on #{name}..."
     yield(name)
   end
   puts "Done"
 end
 
-def each_metapackage
-  METAPACKAGES.each do |name|
-    puts "Working on #{name}..."
-    yield(name)
-  end
-  puts "Done"
-end
