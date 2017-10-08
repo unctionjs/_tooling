@@ -98,3 +98,9 @@ greaterThan
 lessThan
 initial
 exceptKey
+sequence
+like
+selectValues
+rejectValues
+streamOf
+range
