@@ -100,5 +100,6 @@ initial
 exceptKey
 sequence
 selectValues
-rejectValues
-range
+inflateTree
+recordFromEntity
+supertype
