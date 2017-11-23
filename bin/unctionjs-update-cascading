@@ -1,0 +1,11 @@
+#!/usr/bin/env ruby
+
+require "pry"
+require "slop"
+require_relative "../source/unctionjs"
+
+include Unctionjs::Context::Package
+
+puts "Running #{__FILE__}"
+
+`bin/unctionjs update --name=@unction/.+ && bin/unctionjs add --paths=package.json,package-lock.json && bin/unctionjs commit --message="[ignore] cascading upgrade" && bin/unctionjs version --bump=minor && bin/unctionjs publish`

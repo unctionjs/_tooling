@@ -1,0 +1,19 @@
+#!/usr/bin/env ruby
+
+require "pry"
+require "slop"
+require_relative "../source/unctionjs"
+
+include Unctionjs::Context::Package
+
+puts "Running #{__FILE__}"
+
+options = Slop.parse do |let|
+  let.string "--bump", "the version bump type", required: true
+end
+
+with do |name|
+  if different_from_last_tag?(name)
+    `cd ../#{name} && npm version #{options["bump"]}`
+  end
+end

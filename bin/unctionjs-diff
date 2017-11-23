@@ -1,0 +1,13 @@
+#!/usr/bin/env ruby
+
+require "pry"
+require "slop"
+require_relative "../source/unctionjs"
+
+include Unctionjs::Context::Package
+
+puts "Running #{__FILE__}"
+
+with(concurrent: false) do |name|
+  puts `cd ../#{name} && git diff`
+end

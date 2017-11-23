@@ -1,0 +1,24 @@
+#!/usr/bin/env ruby
+
+require "pry"
+require "slop"
+require_relative "../source/unctionjs"
+
+puts "Running #{__FILE__}"
+
+options = Slop.parse do |let|
+  let.string "--scope", "the scope of the packages you care about", required: true
+  let.string "--command", "the command you want to run", required: true
+  let.boolean "--concurrent", "the command you want to run", default: true, required: true
+end
+
+case options["scope"]
+when "package"
+  include Unctionjs::Context::Package
+when "metapackage"
+  include Unctionjs::Context::Metapackage
+end
+
+with(concurrent: options["concurrent"]) do |name|
+  `cd ../#{name}/ && #{option["command"]}`
+end

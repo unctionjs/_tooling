@@ -1,0 +1,17 @@
+#!/usr/bin/env ruby
+
+require "pry"
+require "slop"
+require_relative "../source/unctionjs"
+
+include Unctionjs::Context::Package
+
+puts "Running #{__FILE__}"
+
+options = Slop.parse do |let|
+  let.string "--message", "the commit message", required: true
+end
+
+with do |name|
+  `cd ../#{name} && git commit -m "#{options["message"]}"`
+end

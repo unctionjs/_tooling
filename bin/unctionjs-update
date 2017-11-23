@@ -1,0 +1,32 @@
+#!/usr/bin/env ruby
+
+require "pry"
+require "slop"
+require_relative "../source/unctionjs"
+
+include Unctionjs::Context::Package
+
+puts "Running #{__FILE__}"
+
+options = Slop.parse do |let|
+  let.string "--name", "the name or pattern of a dependency"
+  let.bool "--single", "Use to completely force a single update", default: false
+end
+
+pattern = Regexp.new(options["name"]) unless options["single"]
+
+with do |name|
+  if options["single"]
+    `cd ../#{name} && npm install --no-progress #{options["name"]}@latest`
+  else
+    Oj.load(file(name, "package.json")).
+      fetch("dependencies", {}).
+      keys.
+      select do |dependency|
+        dependency.match?(pattern)
+      end.
+      tap do |dependencies|
+        `cd ../#{name} && npm install --no-progress #{dependencies.map {|dependency| "#{dependency}@latest"}.join(" ")}`
+      end
+    end
+end

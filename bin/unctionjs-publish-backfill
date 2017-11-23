@@ -1,0 +1,21 @@
+#!/usr/bin/env ruby
+
+require "pry"
+require "slop"
+require_relative "../source/unctionjs"
+
+include Unctionjs::Context::Package
+
+puts "Running #{__FILE__}"
+
+with do |name|
+  unless name == "_tempLate"
+    `cd ../#{name} && git stash save`
+    `cd ../#{name} && git tag | xargs`.split(" ").each do |tag|
+      unless published_versions(name).map { |version| "v#{version}" }.include?(tag)
+        `cd ../#{name} && git checkout #{tag} && npm publish`
+      end
+    end
+    `cd ../#{name} && git checkout core && git stash pop`
+  end
+end
