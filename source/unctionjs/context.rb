@@ -30,7 +30,7 @@ module Unctionjs
     end
 
     private def different_version_from_published?(name)
-      published_version(name) != JSON.parse(File.read("../#{name}/package.json"))["version"]
+      published_version(name) != Oj.load(File.read("../#{name}/package.json"))["version"]
     end
 
     private def published_version(name)
@@ -47,6 +47,10 @@ module Unctionjs
 
     private def file(name, path)
       File.read(File.join("..", name, path))
+    end
+
+    private def noncomplete
+      names - ["complete", "_tempLate"]
     end
   end
 end

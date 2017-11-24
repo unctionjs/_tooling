@@ -9,9 +9,5 @@ include Unctionjs::Context::Package
 puts "Running #{__FILE__}"
 
 with(concurrent: false) do |name|
-  if name != "_tempLate" && different_version_from_published?(name)
-    puts "Publishing #{name}..."
-
-    `cd ../#{name} && npm publish`
-  end
+  puts `cd ../#{name} && git stash list`
 end
