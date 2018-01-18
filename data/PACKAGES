@@ -26,7 +26,6 @@ fresh
 hammer
 ifThenElse
 isArray
-isIterable
 isNil
 isObject
 isPopulated
@@ -56,6 +55,7 @@ partition
 pluck
 plucks
 prepend
+recordFromEntity
 recordFrom
 reduceValues
 reduceWithValueKey
@@ -101,5 +101,10 @@ exceptKey
 sequence
 selectValues
 inflateTree
-recordFromEntity
 supertype
+of
+where
+indexBy
+groupBy
+flatten
+isEnumerable

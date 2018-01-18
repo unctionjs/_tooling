@@ -1,7 +1,79 @@
-#!/usr/bin/env bash
+#!/usr/bin/env ruby
 
-bin/unctionjs update --name=@unction/.+ &&
-bin/unctionjs add --paths=package.json,package-lock.json &&
-bin/unctionjs commit --message='[ignore] cascading upgrade' &&
-bin/unctionjs version --bump=minor &&
-bin/unctionjs publish
+require "pry"
+require "slop"
+require_relative "../source/unctionjs"
+
+include Unctionjs::Context::Regular
+
+puts "Running #{__FILE__}"
+
+# options = Slop.parse do |let|
+#   let.string "--name", "the name or pattern of a dependency"
+#   let.bool "--single", "Use to completely force a single update", default: false
+#   let.string "--type", "dependencies, devDependencies, peerDependencies, etc", default: "dependencies"
+# end
+
+@visited = []
+@level = 0
+
+def update_children_of(package)
+  return if package.name == "_tempLate"
+
+  if @visited.include?(package.name)
+    puts "#{"  " * @level}- skipping #{package.name}"
+    return
+  else
+    puts "#{"  " * @level}- visiting #{package.name}"
+  end
+
+  @visited << package.name
+
+  if package.dependencies.any?
+    package.dependencies.each do |dependency|
+      @level += 1
+      update_children_of(dependency)
+      @level -= 1
+    end
+
+    puts "#{"  " * @level}- 🕰"
+    if package.outdated_dependencies.grep(/@unction\/.+/).any?
+      list = package.
+        outdated_dependencies.
+        grep(/@unction\/.+/).
+        join(" ")
+
+      `cd ../#{package.name} && npm install --no-progress --save #{list} > /dev/null`
+      puts "#{"  " * @level}- 📩"
+
+      `cd ../#{package.name} && git add package.json package-lock.json > /dev/null`
+      puts "#{"  " * @level}- ✍️"
+
+      `cd ../#{package.name} && git commit -m "[ignore] cascading upgrade" > /dev/null`
+      puts "#{"  " * @level}- 💾"
+
+      if package.different_from_last_tag?
+        if package.ci_passes?
+          `cd ../#{package.name} && npm version major > /dev/null`
+          puts "#{"  " * @level}- 👊"
+        else
+          puts "#{"  " * @level}- ✋"
+        end
+
+        if package.different_version_from_published?
+          `cd ../#{package.name} && npm publish > /dev/null`
+          puts "#{"  " * @level}- 🌎"
+        else
+          puts "#{"  " * @level}- 🛑"
+        end
+      else
+        puts "#{"  " * @level}- ⏱"
+      end
+
+      `cd ../#{package.name} && git push origin core &> /dev/null`
+      puts "#{"  " * @level}- 😸"
+    end
+  end
+end
+
+update_children_of(Unctionjs::Package.new("complete"))

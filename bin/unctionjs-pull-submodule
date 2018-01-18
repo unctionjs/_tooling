@@ -8,6 +8,6 @@ include Unctionjs::Context::Regular
 
 puts "Running #{__FILE__}"
 
-with(concurrent: false) do |name|
-  `cd ../#{name} && npm run ci`
+with do |name|
+  `cd ../#{name} && git submodule update --init && cd ./types && git checkout core && git pull origin core`
 end

@@ -14,9 +14,9 @@ end
 
 case options["scope"]
 when "package"
-  include Unctionjs::Context::Package
+  include Unctionjs::Context::Regular
 when "metapackage"
-  include Unctionjs::Context::Metapackage
+  include Unctionjs::Context::Meta
 end
 
 with(concurrent: options["concurrent"]) do |name|

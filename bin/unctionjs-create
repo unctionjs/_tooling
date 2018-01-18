@@ -1,16 +1,24 @@
-require_relative './metadata'
+#!/usr/bin/env ruby
 
-print "Name: "
-name = gets.chomp
+require "pry"
+require "slop"
+require_relative "../source/unctionjs"
 
-root = File.join(ENV["HOME"], "Code", "unctionjs", name)
+
+puts "Running #{__FILE__}"
+
+options = Slop.parse do |let|
+  let.string "--name", "the name of the package", required: true
+end
+name = options["name"]
+root = File.join("..", name)
 
 system [
-  "cd ..; hub clone unctionjs/_tempLate #{name}",
-  "cd #{name}",
+  "hub clone unctionjs/_tempLate ../#{name}",
+  "cd ../#{name}",
   "git remote set-url origin git@github.com:unctionjs/#{name}.git",
   "git submodule update --init"
-].join("; ")
+].join(" && ")
 
 location = File.join(root, "package.json")
 old = File.read(location)
@@ -36,7 +44,7 @@ updated = old.gsub("{{NAME}}", name).gsub("{{FQNAME}}", name.downcase)
 
 File.write(location, updated)
 
-location = File.join(".", "PACKAGES")
+location = File.join(".", "data", "PACKAGES")
 old = File.read(location).split("\n")
 updated = [*old, name].uniq.join("\n")
 

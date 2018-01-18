@@ -1,0 +1,19 @@
+#!/usr/bin/env ruby
+
+require "pry"
+require "rgl/adjacency"
+require "rgl/dot"
+require_relative "../source/unctionjs"
+
+include Unctionjs::Context::Regular
+
+puts "Running #{__FILE__}"
+
+RGL::DirectedAdjacencyGraph[
+  *names.reduce([]) do |list, package|
+    dependencies = (Oj.load(File.read(File.join("..", package, "package.json"))).fetch("dependencies", {}) || {}).keys
+    unctions = dependencies.select {|dependency| dependency.match?(/^@unction/) }
+    adjancent = unctions.map {|dependency| ["@unction/#{package.downcase}", dependency]}.flatten
+    [*list, *adjancent].compact
+  end.compact
+].write_to_graphic_file("jpg")

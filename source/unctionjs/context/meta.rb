@@ -1,6 +1,6 @@
 module Unctionjs
   module Context
-    module Metapackage
+    module Meta
       include Context
 
       private def names

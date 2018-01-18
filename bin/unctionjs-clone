@@ -4,7 +4,7 @@ require "pry"
 require "slop"
 require_relative "../source/unctionjs"
 
-include Unctionjs::Context::Package
+include Unctionjs::Context::Regular
 
 puts "Running #{__FILE__}"
 
