@@ -1,13 +1,12 @@
 #!/usr/bin/env ruby
 
-require "pry"
 require "rgl/adjacency"
 require "rgl/dot"
 require_relative "../source/unctionjs"
 
 include Unctionjs::Context::Regular
 
-puts "Running #{__FILE__}"
+Unctionjs.command
 
 RGL::DirectedAdjacencyGraph[
   *names.reduce([]) do |list, package|

@@ -1,29 +1,25 @@
 #!/usr/bin/env ruby
 
-require "pry"
-require "slop"
 require_relative "../source/unctionjs"
 
 include Unctionjs::Context::Regular
 
-puts "Running #{__FILE__}"
-
-options = Slop.parse do |let|
+Unctionjs.command do |let|
   let.array "--packages", "the package names"
   let.string "--type", "the type of dependency: dependencies, devDependencies, etc"
 end
 
 with do |name|
-  if options["packages"].empty?
+  if Unctionjs.options["packages"].empty?
     `cd ../#{name} && npm install --no-progress`
   else
-    case options["type"]
+    case Unctionjs.options["type"]
     when "devDependencies"
-      `cd ../#{name} && npm install --no-progress --save-dev #{options["packages"].join(" ")}`
+      `cd ../#{name} && npm install --no-progress --save-dev #{Unctionjs.options["packages"].join(" ")}`
     when "dependencies"
-      `cd ../#{name} && npm install --no-progress --save #{options["packages"].join(" ")}`
+      `cd ../#{name} && npm install --no-progress --save #{Unctionjs.options["packages"].join(" ")}`
     when "peerDependencies"
-      `cd ../#{name} && npm install --no-progress --save-peer #{options["packages"].join(" ")}`
+      `cd ../#{name} && npm install --no-progress --save-peer #{Unctionjs.options["packages"].join(" ")}`
     else raise ArgumentError, "--type is required if --packages is specified"
     end
   end

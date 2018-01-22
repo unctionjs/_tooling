@@ -13,7 +13,7 @@ module Unctionjs
     end
 
     def different_from_last_tag?
-      `cd ../#{name} && git diff HEAD..#{latest_version}` != ""
+      `cd ../#{name} && git diff HEAD..#{latest_tagged_version}` != ""
     end
 
     def different_version_from_published?
@@ -28,8 +28,12 @@ module Unctionjs
       Oj.load(`npm show --porcelain #{fullname} versions`.strip.gsub(/\s/, "").gsub("'", '"'))
     end
 
-    def latest_version
+    def latest_tagged_version
       `cd ../#{name}; git tag`.split("\n").sort_by { |version| version.gsub("v", "").split(".").map(&:to_i) }.last
+    end
+
+    def current_version
+      packagefile["version"]
     end
 
     def packagefile
@@ -51,8 +55,7 @@ module Unctionjs
 
     def outdated_dependencies
       dependencies.
-        select {|package| system("cd ../#{package.name} && npm outdated | grep #{package.name} > /dev/null")}.
-        map {|package| "#{package.fullname}@latest"}
+        select {|dependency| `cd ../#{name} && npm outdated`.match?(/^#{dependency.fullname}/)}
     end
     memoize :outdated_dependencies
 

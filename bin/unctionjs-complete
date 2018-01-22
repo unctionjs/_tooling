@@ -1,12 +1,10 @@
 #!/usr/bin/env ruby
 
-require "pry"
-require "slop"
 require_relative "../source/unctionjs"
 
 include Unctionjs::Context::Regular
 
-puts "Running #{__FILE__}"
+Unctionjs.command
 
 documentation = File.read(File.join("data", "README.md"))
 packages = noncomplete.map do |name|

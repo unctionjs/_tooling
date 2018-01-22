@@ -1,16 +1,11 @@
 #!/usr/bin/env ruby
 
-require "pry"
-require "slop"
 require_relative "../source/unctionjs"
 
-
-puts "Running #{__FILE__}"
-
-options = Slop.parse do |let|
+Unctionjs.command do |let|
   let.string "--name", "the name of the package", required: true
 end
-name = options["name"]
+name = Unctionjs.options["name"]
 root = File.join("..", name)
 
 system [

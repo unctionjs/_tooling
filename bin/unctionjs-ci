@@ -1,13 +1,13 @@
 #!/usr/bin/env ruby
 
-require "pry"
-require "slop"
 require_relative "../source/unctionjs"
 
 include Unctionjs::Context::Regular
 
-puts "Running #{__FILE__}"
+Unctionjs.command
 
 with(concurrent: false) do |name|
-  `cd ../#{name} && npm run ci`
+  unless name == "_tempLate"
+    `cd ../#{name} && npm run ci`
+  end
 end

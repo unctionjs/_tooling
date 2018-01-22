@@ -1,18 +1,14 @@
 #!/usr/bin/env ruby
 
-require "pry"
-require "slop"
 require_relative "../source/unctionjs"
 
 include Unctionjs::Context::Regular
 
-puts "Running #{__FILE__}"
-
-options = Slop.parse do |let|
+Unctionjs.command do |let|
   let.string "--from", "The origin", required: true
   let.string "--to", "The destination", required: true
 end
 
 with do |name|
-  `cd ../#{name} && git mv #{options["from"]} #{options["to"]}; mv #{options["from"]} #{options["to"]}`
+  `cd ../#{name} && git mv #{Unctionjs.options["from"]} #{Unctionjs.options["to"]}; mv #{Unctionjs.options["from"]} #{Unctionjs.options["to"]}`
 end

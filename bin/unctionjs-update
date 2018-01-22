@@ -1,26 +1,22 @@
 #!/usr/bin/env ruby
 
-require "pry"
-require "slop"
 require_relative "../source/unctionjs"
 
 include Unctionjs::Context::Regular
 
-puts "Running #{__FILE__}"
-
-options = Slop.parse do |let|
+Unctionjs.command do |let|
   let.string "--name", "the name or pattern of a dependency"
   let.bool "--single", "Use to completely force a single update", default: false
   let.string "--type", "dependencies, devDependencies, peerDependencies, etc", default: "dependencies"
 end
 
-pattern = Regexp.new(options["name"]) unless options["single"]
+pattern = Regexp.new(Unctionjs.options["name"]) unless Unctionjs.options["single"]
 
 puts "Matching against #{pattern}"
 
 with do |name|
-  if options["single"]
-    `cd ../#{name} && npm install --no-progress #{options["name"]}@latest`
+  if Unctionjs.options["single"]
+    `cd ../#{name} && npm install --no-progress #{Unctionjs.options["name"]}@latest`
   else
     puts "#{dependencies.count} dependencies"
     unless dependencies.empty?
@@ -31,7 +27,7 @@ with do |name|
           grep(pattern).
           join(" ").
           tap do |list|
-            case options["type"]
+            case Unctionjs.options["type"]
             when "dependencies"
               `cd ../#{name} && npm install --no-progress --save #{list}`
             when "devDependencies"

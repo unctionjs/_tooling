@@ -1,18 +1,12 @@
 #!/usr/bin/env ruby
 
-require "pry"
-require "slop"
 require_relative "../source/unctionjs"
 
 include Unctionjs::Context::Regular
 
-puts "Running #{__FILE__}"
-
-# options = Slop.parse do |let|
-#   let.string "--name", "the name or pattern of a dependency"
-#   let.bool "--single", "Use to completely force a single update", default: false
-#   let.string "--type", "dependencies, devDependencies, peerDependencies, etc", default: "dependencies"
-# end
+Unctionjs.command do |let|
+  let.string "--root", "the root package you want to start with", default: "complete"
+end
 
 @visited = []
 @level = 0
@@ -20,60 +14,62 @@ puts "Running #{__FILE__}"
 def update_children_of(package)
   return if package.name == "_tempLate"
 
+
   if @visited.include?(package.name)
-    puts "#{"  " * @level}- skipping #{package.name}"
+    puts "skipping #{package.name}"
     return
-  else
-    puts "#{"  " * @level}- visiting #{package.name}"
   end
 
   @visited << package.name
 
   if package.dependencies.any?
     package.dependencies.each do |dependency|
-      @level += 1
       update_children_of(dependency)
-      @level -= 1
     end
 
-    puts "#{"  " * @level}- 🕰"
-    if package.outdated_dependencies.grep(/@unction\/.+/).any?
-      list = package.
-        outdated_dependencies.
-        grep(/@unction\/.+/).
-        join(" ")
+    puts "visiting #{package.name}"
+    puts "  - 🕰 checking for outdated dependencies"
+    outdated = package.
+      outdated_dependencies.
+      map {|dependency| "#{dependency.fullname}@latest"}.
+      grep(/^@unction\/.+/)
+
+    if outdated.any?
+      list = outdated.join(" ")
 
       `cd ../#{package.name} && npm install --no-progress --save #{list} > /dev/null`
-      puts "#{"  " * @level}- 📩"
+      puts "  - 📩 updating #{list}"
 
       `cd ../#{package.name} && git add package.json package-lock.json > /dev/null`
-      puts "#{"  " * @level}- ✍️"
+      puts "  - ✍️ adding package.json and package-lock.json"
 
       `cd ../#{package.name} && git commit -m "[ignore] cascading upgrade" > /dev/null`
-      puts "#{"  " * @level}- 💾"
+      puts "  - 💾 committing changes"
 
       if package.different_from_last_tag?
         if package.ci_passes?
-          `cd ../#{package.name} && npm version major > /dev/null`
-          puts "#{"  " * @level}- 👊"
+          puts `cd ../#{package.name} && git diff #{package.latest_tagged_version}`
+          breakage = Unctionjs.interface.ask("How much did you break? (major, minor, patch)")
+          `cd ../#{package.name} && npm version #{breakage} > /dev/null`
+          puts "  - 👊 upgraded to version #{package.current_version} (#{breakage} bump)"
         else
-          puts "#{"  " * @level}- ✋"
+          puts "  - ✋ ci did not pass"
         end
 
         if package.different_version_from_published?
           `cd ../#{package.name} && npm publish > /dev/null`
-          puts "#{"  " * @level}- 🌎"
+          puts "  - 🌎 publishing to npm"
         else
-          puts "#{"  " * @level}- 🛑"
+          puts "  - 🛑 could not publish"
         end
       else
-        puts "#{"  " * @level}- ⏱"
+        puts "  - ⏱ already published this version"
       end
 
       `cd ../#{package.name} && git push origin core &> /dev/null`
-      puts "#{"  " * @level}- 😸"
+      puts "  - 😸 pushing to github"
     end
   end
 end
 
-update_children_of(Unctionjs::Package.new("complete"))
+update_children_of(Unctionjs::Package.new(Unctionjs.options["root"]))

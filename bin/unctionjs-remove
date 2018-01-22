@@ -1,17 +1,13 @@
 #!/usr/bin/env ruby
 
-require "pry"
-require "slop"
 require_relative "../source/unctionjs"
 
 include Unctionjs::Context::Regular
 
-puts "Running #{__FILE__}"
-
-options = Slop.parse do |let|
+Unctionjs.command do |let|
   let.array "--paths", "the list of files", required: true
 end
 
 with do |name|
-  `cd ../#{name} && git rm #{options["paths"].join(" ")}; rm -r #{options["paths"].join(" ")}`
+  `cd ../#{name} && git rm #{Unctionjs.options["paths"].join(" ")}; rm -r #{Unctionjs.options["paths"].join(" ")}`
 end
