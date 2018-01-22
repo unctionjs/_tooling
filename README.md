@@ -15,7 +15,7 @@ The only repository that blurs the line is `_tempLate`, which is a metapackage t
 description: adds files to git
 usage: unctionjs add [options]
     --files  the list of files (filea,fileb)
-    --help
+    --help   
 
 ```
 
@@ -23,7 +23,6 @@ usage: unctionjs add [options]
 
 ```
 
-description:
 usage: unctionjs ci [options]
     --help  
 
@@ -33,7 +32,6 @@ usage: unctionjs ci [options]
 
 ```
 
-description:
 usage: unctionjs clone [options]
     --help  
 
@@ -43,7 +41,6 @@ usage: unctionjs clone [options]
 
 ```
 
-description:
 usage: unctionjs commit [options]
     --message  the commit message
     --help     
@@ -54,7 +51,6 @@ usage: unctionjs commit [options]
 
 ```
 
-description:
 usage: unctionjs complete [options]
     --help  
 
@@ -64,7 +60,6 @@ usage: unctionjs complete [options]
 
 ```
 
-description:
 usage: unctionjs create [options]
     --name  the name of the package
     --help  
@@ -75,7 +70,6 @@ usage: unctionjs create [options]
 
 ```
 
-description:
 usage: unctionjs diff [options]
     --help  
 
@@ -85,7 +79,6 @@ usage: unctionjs diff [options]
 
 ```
 
-description:
 usage: unctionjs discard [options]
     --paths  the list of files
     --help   
@@ -96,7 +89,6 @@ usage: unctionjs discard [options]
 
 ```
 
-description:
 usage: unctionjs document [options]
     --help  
 
@@ -106,11 +98,11 @@ usage: unctionjs document [options]
 
 ```
 
-description:
+description: runs a command over each of a specific type of repository
 usage: unctionjs each [options]
     --scope       the scope of the packages you care about
     --command     the command you want to run
-    --concurrent  the command you want to run
+    --concurrent  if you want it to be concurrent
     --help        
 
 ```
@@ -119,7 +111,6 @@ usage: unctionjs each [options]
 
 ```
 
-description:
 usage: unctionjs graph [options]
     --help  
 
@@ -129,7 +120,6 @@ usage: unctionjs graph [options]
 
 ```
 
-description:
 usage: unctionjs indexed [options]
     --help  
 
@@ -139,7 +129,6 @@ usage: unctionjs indexed [options]
 
 ```
 
-description:
 usage: unctionjs install [options]
     --packages  the package names
     --type      the type of dependency: dependencies, devDependencies, etc
@@ -151,7 +140,6 @@ usage: unctionjs install [options]
 
 ```
 
-description:
 usage: unctionjs move [options]
     --from  The origin
     --to    The destination
@@ -163,7 +151,6 @@ usage: unctionjs move [options]
 
 ```
 
-description:
 usage: unctionjs publish [options]
     --help  
 
@@ -173,7 +160,6 @@ usage: unctionjs publish [options]
 
 ```
 
-description:
 usage: unctionjs publish-backfill [options]
     --help  
 
@@ -183,7 +169,6 @@ usage: unctionjs publish-backfill [options]
 
 ```
 
-description:
 usage: unctionjs pull [options]
     --help  
 
@@ -193,7 +178,6 @@ usage: unctionjs pull [options]
 
 ```
 
-description:
 usage: unctionjs pull-submodule [options]
     --help  
 
@@ -203,7 +187,6 @@ usage: unctionjs pull-submodule [options]
 
 ```
 
-description:
 usage: unctionjs push [options]
     --help  
 
@@ -213,7 +196,6 @@ usage: unctionjs push [options]
 
 ```
 
-description:
 usage: unctionjs remove [options]
     --paths  the list of files
     --help   
@@ -224,7 +206,6 @@ usage: unctionjs remove [options]
 
 ```
 
-description:
 usage: unctionjs reset [options]
     --paths  the list of files
     --help   
@@ -235,7 +216,6 @@ usage: unctionjs reset [options]
 
 ```
 
-description:
 usage: unctionjs rewrite [options]
     --help  
 
@@ -245,7 +225,6 @@ usage: unctionjs rewrite [options]
 
 ```
 
-description:
 usage: unctionjs stash-list [options]
     --help  
 
@@ -255,7 +234,6 @@ usage: unctionjs stash-list [options]
 
 ```
 
-description:
 usage: unctionjs test [options]
     --help  
 
@@ -265,7 +243,6 @@ usage: unctionjs test [options]
 
 ```
 
-description:
 usage: unctionjs update [options]
     --name    the name or pattern of a dependency
     --single  Use to completely force a single update
@@ -278,7 +255,6 @@ usage: unctionjs update [options]
 
 ```
 
-description:
 usage: unctionjs update-cascading [options]
     --root  the root package you want to start with
     --help  
@@ -289,9 +265,9 @@ usage: unctionjs update-cascading [options]
 
 ```
 
-description:
 usage: unctionjs version [options]
     --bump  the version bump type
     --help  
 
 ```
+

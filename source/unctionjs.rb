@@ -19,7 +19,7 @@ module Unctionjs
     @options
   end
 
-  def self.command(description = "", &configuration)
+  def self.command(description = nil, &configuration)
     @options ||= Slop.parse do |let|
       let.banner = if description
         ["description: #{description}", let.banner.gsub("bin/unctionjs-", "unctionjs ")].compact.join("\n")

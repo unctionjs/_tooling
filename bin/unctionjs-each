@@ -2,10 +2,10 @@
 
 require_relative "../source/unctionjs"
 
-Unctionjs.command do |let|
+Unctionjs.command("runs a command over each of a specific type of repository") do |let|
   let.string "--scope", "the scope of the packages you care about", required: true
   let.string "--command", "the command you want to run", required: true
-  let.boolean "--concurrent", "the command you want to run", default: true, required: true
+  let.boolean "--concurrent", "if you want it to be concurrent", default: true, required: true
 end
 
 case Unctionjs.options["scope"]
