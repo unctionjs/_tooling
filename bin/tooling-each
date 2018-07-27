@@ -1,0 +1,14 @@
+#!/usr/bin/env ruby
+
+require_relative "../source/tooling"
+
+Tooling.command("runs a command over each repository") do |let|
+  let.string "--command", "the command you want to run", required: true
+  let.boolean "--concurrent", "if you want it to be concurrent", default: true, required: true
+end
+
+include Tooling::Context::Active
+
+with(concurrent: Tooling.options["concurrent"]) do |name|
+  `cd ../#{name}/ && #{option["command"]}`
+end

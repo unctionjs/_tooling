@@ -1,5 +1,0 @@
-#!/usr/bin/env ruby
-
-require "pry"
-
-exec("bin/unctionjs-#{ARGV[0]} #{ARGV.drop(1).join(" ")}")

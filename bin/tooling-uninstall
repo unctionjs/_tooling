@@ -1,0 +1,25 @@
+#!/usr/bin/env ruby
+
+require_relative "../source/tooling"
+
+include Tooling::Context::Active
+
+Tooling.command do |let|
+  let.array "--packages", "the package names", required: true
+  let.string "--type", "the type of dependency: dependencies, devDependencies, etc", required: true
+end
+
+with do |name|
+  if Tooling.options["packages"].empty?
+    `cd ../#{name} && npm uninstall --no-progress`
+  else
+    case Tooling.options["type"]
+    when "devDependencies"
+      `cd ../#{name} && npm uninstall --no-progress --save-dev #{Tooling.options["packages"].join(" ")}`
+    when "dependencies"
+      `cd ../#{name} && npm uninstall --no-progress --save #{Tooling.options["packages"].join(" ")}`
+    when "peerDependencies"
+      `cd ../#{name} && npm uninstall --no-progress --save-peer #{Tooling.options["packages"].join(" ")}`
+    end
+  end
+end

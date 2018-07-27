@@ -1,0 +1,13 @@
+#!/usr/bin/env ruby
+
+require_relative "../source/tooling"
+
+include Tooling::Context::Active
+
+Tooling.command do |let|
+  let.array "--paths", "the list of files", required: true
+end
+
+with do |name|
+  `cd ../#{name} && git checkout -- #{Tooling.options["paths"].join(" ")}`
+end

@@ -1,0 +1,51 @@
+#!/usr/bin/env ruby
+
+require_relative "../source/tooling"
+
+include Tooling::Context::Active
+
+Tooling.command
+
+template = File.join("..", "_tempLate")
+
+with do |name|
+  next if name == "_tempLate"
+  location = File.join("..", name, ".babelrc")
+  File.write(location, File.read(File.join(template, ".babelrc")))
+
+  location = File.join("..", name, ".eslintrc.js")
+  File.write(location, File.read(File.join(template, ".eslintrc.js")))
+
+  location = File.join("..", name, ".flowconfig")
+  File.write(location, File.read(File.join(template, ".flowconfig")))
+
+  location = File.join("..", name, ".gitignore")
+  File.write(location, File.read(File.join(template, ".gitignore")))
+
+  location = File.join("..", name, ".gitmodules")
+  File.write(location, File.read(File.join(template, ".gitmodules")))
+
+  location = File.join("..", name, ".travis.yml")
+  File.write(location, File.read(File.join(template, ".travis.yml")))
+
+  location = File.join("..", name, "CONDUCT.md")
+  File.write(location, File.read(File.join(template, "CONDUCT.md")))
+
+  location = File.join("..", name, "LICENSE")
+  File.write(location, File.read(File.join(template, "LICENSE")))
+
+  location = File.join("..", name, "package.json")
+  original = JSON.parse(File.read(File.join(template, "package.json")))
+  old = JSON.parse(File.read(location))
+  updated = old.merge({
+    "scripts" => original["scripts"],
+    "keywords" => original["keywords"],
+    "license" => original["license"],
+    "homepage" => original["homepage"].gsub("{{NAME}}", name),
+    "repository" => original["repository"].gsub("{{NAME}}", name),
+    "bugs" => original["bugs"].gsub("{{NAME}}", name),
+    "main" => original["main"],
+    "files" => original["files"]
+  })
+  File.write(location, JSON.pretty_generate(updated) + "\n")
+end

@@ -1,0 +1,26 @@
+#!/usr/bin/env ruby
+
+require_relative "../source/tooling"
+
+include Tooling::Context::Active
+
+Tooling.command do |let|
+  let.array "--packages", "the package names"
+  let.string "--type", "the type of dependency: dependencies, devDependencies, etc"
+end
+
+with do |name|
+  if Tooling.options["packages"].empty?
+    `cd ../#{name} && npm install --no-progress`
+  else
+    case Tooling.options["type"]
+    when "devDependencies"
+      `cd ../#{name} && npm install --no-progress --save-dev #{Tooling.options["packages"].join(" ")}`
+    when "dependencies"
+      `cd ../#{name} && npm install --no-progress --save #{Tooling.options["packages"].join(" ")}`
+    when "peerDependencies"
+      `cd ../#{name} && npm install --no-progress --save-peer #{Tooling.options["packages"].join(" ")}`
+    else raise ArgumentError, "--type is required if --packages is specified"
+    end
+  end
+end

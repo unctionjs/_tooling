@@ -1,0 +1,54 @@
+#!/usr/bin/env ruby
+
+require_relative "../source/tooling"
+
+include Tooling::Context::Active
+
+Tooling.command("renames packages") do |let|
+  let.string "--old", "the old package", required: true
+  let.string "--new", "the new package", required: true
+end
+
+old = Tooling.options["old"]
+new = Tooling.options["new"]
+
+puts "Copying #{old} to #{new}"
+system("cd ../ && cp -r #{old} #{new}")
+puts "Removing generated files"
+system("cd ../#{new}/ && rm -rf .git/ node_modules/ transpiled/ coverage/ .nyc_output/")
+system("cd ../#{new} && git init")
+File.write(File.join("..", new, ".git", "HEAD"), "ref: refs/heads/core")
+puts "Creating github repository"
+system("cd ../#{new} && hub create unctionjs/#{new}")
+system("cd ../ && atom #{old} #{new}")
+system("cd ../ && open -a iTerm.app #{old}")
+system("cd ../ && open -a iTerm.app #{new}")
+puts "- [ ] Change README.md names"
+puts "- [ ] Change index.js names"
+puts "- [ ] Change test.js names"
+puts "- [ ] Set version to 1.0.0"
+$stdin.gets
+puts "ARE YOU SURE?!"
+$stdin.gets
+system("cd ../#{new} && npm install")
+system("cd ../#{new} && npm run ci")
+system("cd ../#{new} && git add . && git commit -m 'Hello, #{new}' && git tag v1.0.0")
+system("cd ../#{new} && git push -u --tags origin core")
+system("cd ../#{new} && npm publish")
+puts "- [ ] Add deprecation notice to README.md"
+puts "**NOTE: This library has been deprecated in favor of [unction/#{new}](https://github.com/unctionjs/#{new})**"
+$stdin.gets
+puts "ARE YOU SURE?!"
+$stdin.gets
+active = File.join(".", "data", "ACTIVE")
+File.write(active, [*File.read(active).split("\n"), new].uniq.join("\n"))
+system("cd ../#{old} && git add . && git commit -m 'Goodbye, #{old}'")
+system("cd ../#{old} && npm deprecate @unction/#{old.downcase} 'We have renamed this package to @unctionjs/#{new}'")
+system("cd ../#{old} && git push --tags origin core")
+active = File.join(".", "data", "ACTIVE")
+File.write(active, (File.read(active).split("\n") - [old]).uniq.join("\n"))
+deprecated = File.join(".", "data", "DEPRECATED")
+File.write(deprecated, [*File.read(deprecated).split("\n"), old].uniq.join("\n"))
+puts "- [ ] Archive on https://github.com/unctionjs/#{old}"
+$stdin.gets
+puts "Completed rename"

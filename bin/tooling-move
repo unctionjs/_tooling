@@ -1,0 +1,14 @@
+#!/usr/bin/env ruby
+
+require_relative "../source/tooling"
+
+include Tooling::Context::Active
+
+Tooling.command do |let|
+  let.string "--from", "The origin", required: true
+  let.string "--to", "The destination", required: true
+end
+
+with do |name|
+  `cd ../#{name} && git mv #{Tooling.options["from"]} #{Tooling.options["to"]}; mv #{Tooling.options["from"]} #{Tooling.options["to"]}`
+end

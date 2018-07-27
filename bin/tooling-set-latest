@@ -1,0 +1,12 @@
+#!/usr/bin/env ruby
+
+require_relative "../source/tooling"
+
+include Tooling::Context::Active
+
+Tooling.command("Tag a version as the latest")
+
+with do |name|
+  next if next == "_tempLate"
+  system("cd ../#{name} && npm dist-tag add @unction/#{name.downcase}@#{Tooling::Package.new(name).npm_latest_version} latest")
+end

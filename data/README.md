@@ -1,6 +1,21 @@
-## Using
+# unction.js
 
-You can either install the complete package:
+unction.js is a collection of many functions. All functions are bound by three principles that are detailed below.
+
+
+## Using unction libraries
+
+You can install a package individually:
+
+```
+npm install --save @unction/treeify
+```
+
+``` javascript
+import treeify from "@unction/treeify"
+```
+
+Or you can install the **complete** package:
 
 ``` bash
 npm install --save @unction/complete
@@ -12,22 +27,10 @@ and import the function from package:
 import {treeify} from "@unction/complete"
 ```
 
-Or you can install the package individually:
 
-```
-npm install --save @unction/treeify
-```
+## Principle 1
 
-And import it individually:
-
-``` javascript
-import treeify from "@unction/treeify"
-```
-
-
-## Principle 1: All functions are curried
-
-Due to the nature of functional programming it's exceedingly valuable to have functions that are, by default, curried. Here's an erxample:
+**All functions are curried**. Due to the nature of functional programming it's exceedingly valuable to have functions that are, by default, curried. Here's an erxample:
 
 
 ``` javascript
@@ -56,9 +59,9 @@ stateTree(data)
 ```
 
 
-## Principle 2: All functions know how to deal with a finite set of primitives
+## Principle 2
 
-When using a unctionjs function you can be sure that we'll be able to handle all 6 enumerable types:
+**All functions know how to deal with a finite set of primitives**. When using a unctionjs function you can be sure that we'll be able to handle all 6 enumerable types:
 
   - Array
   - Object
@@ -68,14 +71,14 @@ When using a unctionjs function you can be sure that we'll be able to handle all
   - Stream (see: most.js)
 
 
-## Principle 3: All functions are pure by default
+## Principle 3
 
-No function will ever have any side-effects (unless otherwise noted with a `I` suffix like `shuffleI()`) and are referentially transparent.
+**All functions are pure by default**. No function will ever have any side-effects (unless otherwise noted with a `I` suffix like `shuffleI()`) and are referentially transparent.
 
 
-## Principle 4: All functions are immutable by default
+## Principle 4
 
-These functions do not mutate (unless otherwise noted with a `M` suffix like `appendM()`) the original values.
+**All functions are immutable by default**. These functions do not mutate (unless otherwise noted with a `M` suffix like `appendM()`) the original values.
 
 
 ## Raison d'exister

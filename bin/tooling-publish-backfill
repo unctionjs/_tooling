@@ -1,0 +1,19 @@
+#!/usr/bin/env ruby
+
+require_relative "../source/tooling"
+
+include Tooling::Context::Active
+
+Tooling.command
+
+with do |name|
+  next if name == "_tempLate"
+
+  published = Tooling::Package.new(name).npm_versions.map { |version| "v#{version}" }
+  tagged = `cd ../#{name} && git tag | xargs`.chomp.split(" ")
+
+  (tagged - published).each do |tag|
+    system("cd ../#{name} && git checkout #{tag} && npm publish")
+  end
+  system("cd ../#{name} && git checkout core")
+end

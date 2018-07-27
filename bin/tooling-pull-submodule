@@ -1,0 +1,11 @@
+#!/usr/bin/env ruby
+
+require_relative "../source/tooling"
+
+include Tooling::Context::Active
+
+Tooling.command
+
+with do |name|
+  `cd ../#{name} && git submodule update --init && cd ./types && git checkout core && git pull origin core`
+end

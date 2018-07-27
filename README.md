@@ -1,11 +1,6 @@
-# unctionjs tooling
+# tooling tooling
 
-This is a list of all the tools available for managing all unctionjs packages. There are two types of repository:
-
-  - Metapackage, which are random things like the type repository and this repository
-  - Package, which is a npm package
-
-The only repository that blurs the line is `_tempLate`, which is a metapackage that we also want to maintain the same way.
+This is a list of all the tools available for managing all tooling packages. The only repository that blurs the line is `_tempLate`, which is a metapackage that we also want to maintain the same way.
 
 
 ## add
@@ -13,7 +8,7 @@ The only repository that blurs the line is `_tempLate`, which is a metapackage t
 ```
 
 description: adds files to git
-usage: unctionjs add [options]
+usage: tooling add [options]
     --files  the list of files (filea,fileb)
     --help   
 
@@ -23,7 +18,7 @@ usage: unctionjs add [options]
 
 ```
 
-usage: unctionjs ci [options]
+usage: tooling ci [options]
     --help  
 
 ```
@@ -32,7 +27,7 @@ usage: unctionjs ci [options]
 
 ```
 
-usage: unctionjs clone [options]
+usage: tooling clone [options]
     --help  
 
 ```
@@ -41,9 +36,8 @@ usage: unctionjs clone [options]
 
 ```
 
-usage: unctionjs commit [options]
-    --message  the commit message
-    --help     
+usage: tooling commit [options]
+    --help  
 
 ```
 
@@ -51,7 +45,7 @@ usage: unctionjs commit [options]
 
 ```
 
-usage: unctionjs complete [options]
+usage: tooling complete [options]
     --help  
 
 ```
@@ -60,7 +54,7 @@ usage: unctionjs complete [options]
 
 ```
 
-usage: unctionjs create [options]
+usage: tooling create [options]
     --name  the name of the package
     --help  
 
@@ -70,7 +64,7 @@ usage: unctionjs create [options]
 
 ```
 
-usage: unctionjs diff [options]
+usage: tooling diff [options]
     --help  
 
 ```
@@ -79,7 +73,7 @@ usage: unctionjs diff [options]
 
 ```
 
-usage: unctionjs discard [options]
+usage: tooling discard [options]
     --paths  the list of files
     --help   
 
@@ -89,7 +83,7 @@ usage: unctionjs discard [options]
 
 ```
 
-usage: unctionjs document [options]
+usage: tooling document [options]
     --help  
 
 ```
@@ -98,9 +92,8 @@ usage: unctionjs document [options]
 
 ```
 
-description: runs a command over each of a specific type of repository
-usage: unctionjs each [options]
-    --scope       the scope of the packages you care about
+description: runs a command over each repository
+usage: tooling each [options]
     --command     the command you want to run
     --concurrent  if you want it to be concurrent
     --help        
@@ -111,7 +104,7 @@ usage: unctionjs each [options]
 
 ```
 
-usage: unctionjs graph [options]
+usage: tooling graph [options]
     --help  
 
 ```
@@ -120,7 +113,7 @@ usage: unctionjs graph [options]
 
 ```
 
-usage: unctionjs indexed [options]
+usage: tooling indexed [options]
     --help  
 
 ```
@@ -129,7 +122,7 @@ usage: unctionjs indexed [options]
 
 ```
 
-usage: unctionjs install [options]
+usage: tooling install [options]
     --packages  the package names
     --type      the type of dependency: dependencies, devDependencies, etc
     --help      
@@ -140,7 +133,7 @@ usage: unctionjs install [options]
 
 ```
 
-usage: unctionjs move [options]
+usage: tooling move [options]
     --from  The origin
     --to    The destination
     --help  
@@ -151,7 +144,7 @@ usage: unctionjs move [options]
 
 ```
 
-usage: unctionjs publish [options]
+usage: tooling publish [options]
     --help  
 
 ```
@@ -160,7 +153,7 @@ usage: unctionjs publish [options]
 
 ```
 
-usage: unctionjs publish-backfill [options]
+usage: tooling publish-backfill [options]
     --help  
 
 ```
@@ -169,7 +162,7 @@ usage: unctionjs publish-backfill [options]
 
 ```
 
-usage: unctionjs pull [options]
+usage: tooling pull [options]
     --help  
 
 ```
@@ -178,7 +171,7 @@ usage: unctionjs pull [options]
 
 ```
 
-usage: unctionjs pull-submodule [options]
+usage: tooling pull-submodule [options]
     --help  
 
 ```
@@ -187,7 +180,7 @@ usage: unctionjs pull-submodule [options]
 
 ```
 
-usage: unctionjs push [options]
+usage: tooling push [options]
     --help  
 
 ```
@@ -196,9 +189,21 @@ usage: unctionjs push [options]
 
 ```
 
-usage: unctionjs remove [options]
+usage: tooling remove [options]
     --paths  the list of files
     --help   
+
+```
+
+## rename
+
+```
+
+description: renames packages
+usage: tooling rename [options]
+    --old   the old package
+    --new   the new package
+    --help  
 
 ```
 
@@ -206,7 +211,7 @@ usage: unctionjs remove [options]
 
 ```
 
-usage: unctionjs reset [options]
+usage: tooling reset [options]
     --paths  the list of files
     --help   
 
@@ -216,7 +221,7 @@ usage: unctionjs reset [options]
 
 ```
 
-usage: unctionjs rewrite [options]
+usage: tooling rewrite [options]
     --help  
 
 ```
@@ -225,7 +230,7 @@ usage: unctionjs rewrite [options]
 
 ```
 
-usage: unctionjs stash-list [options]
+usage: tooling stash-list [options]
     --help  
 
 ```
@@ -234,8 +239,29 @@ usage: unctionjs stash-list [options]
 
 ```
 
-usage: unctionjs test [options]
+usage: tooling test [options]
     --help  
+
+```
+
+## unfinished
+
+```
+
+description: finds unfinished changes
+usage: tooling unfinished [options]
+    --help  
+
+```
+
+## uninstall
+
+```
+
+usage: tooling uninstall [options]
+    --packages  the package names
+    --type      the type of dependency: dependencies, devDependencies, etc
+    --help      
 
 ```
 
@@ -243,7 +269,7 @@ usage: unctionjs test [options]
 
 ```
 
-usage: unctionjs update [options]
+usage: tooling update [options]
     --name    the name or pattern of a dependency
     --single  Use to completely force a single update
     --type    dependencies, devDependencies, peerDependencies, etc
@@ -255,7 +281,7 @@ usage: unctionjs update [options]
 
 ```
 
-usage: unctionjs update-cascading [options]
+usage: tooling update-cascading [options]
     --root  the root package you want to start with
     --help  
 
@@ -265,7 +291,7 @@ usage: unctionjs update-cascading [options]
 
 ```
 
-usage: unctionjs version [options]
+usage: tooling version [options]
     --bump  the version bump type
     --help  
 

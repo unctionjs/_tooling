@@ -1,0 +1,51 @@
+#!/usr/bin/env ruby
+
+require_relative "../source/tooling"
+
+Tooling.command do |let|
+  let.string "--name", "the name of the package", required: true
+end
+name = Tooling.options["name"]
+root = File.join("..", name)
+
+system [
+  "hub clone unctionjs/_tempLate ../#{name}",
+  "cd ../#{name}",
+  "git remote remove origin",
+  "hub create unctionjs/#{name}",
+  "git submodule update --init"
+].join(" && ")
+
+File.write(File.join(root, ".git", "HEAD"), "ref: refs/heads/core")
+
+location = File.join(root, "package.json")
+old = File.read(location)
+updated = old.gsub("{{NAME}}", name).gsub("{{FQNAME}}", name.downcase)
+
+File.write(location, updated)
+
+location = File.join(root, "README.md")
+old = File.read(location)
+updated = old.gsub("{{NAME}}", name).gsub("{{FQNAME}}", name.downcase)
+
+File.write(location, updated)
+
+location = File.join(root, "index.js")
+old = File.read(location)
+updated = old.gsub("{{NAME}}", name).gsub("{{FQNAME}}", name.downcase)
+
+File.write(location, updated)
+
+location = File.join(root, "test.js")
+old = File.read(location)
+updated = old.gsub("{{NAME}}", name).gsub("{{FQNAME}}", name.downcase)
+
+File.write(location, updated)
+
+location = File.join(".", "data", "ACTIVE")
+old = File.read(location).split("\n")
+updated = [*old, name].uniq.join("\n")
+
+File.write(location, updated)
+system("atom ../#{name}")
+system("open -a iTerm.app ../#{name}")

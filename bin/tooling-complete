@@ -1,0 +1,50 @@
+#!/usr/bin/env ruby
+
+require_relative "../source/tooling"
+
+include Tooling::Context::Active
+
+Tooling.command
+
+documentation = File.read(File.join("data", "README.md"))
+packages = noncomplete.map do |name|
+  metadata = Oj.load(File.read(File.join("..", name, "package.json")))
+  {
+    import: "export {default as #{name}} from \"#{metadata["name"]}\"",
+    readme: File.read(File.join("..", name, "README.md")).
+      gsub(/^# @unction.+$/, "### [#{name}](https://github.com/unctionjs/#{name}#readme)()").
+      gsub(/^> (.+)/, "```\n\\1\n```").
+      gsub(/(\w+?)Type/, "\\1").
+      gsub(/\|/, "\|"),
+    dependency: {metadata["name"] => metadata["version"]}
+  }
+end.map(&OpenStruct.method(:new))
+
+# Write dependencies
+File.write(
+  File.join("..", "complete", "package.json"),
+  JSON.pretty_generate(
+    Oj.load(File.read(File.join("..", "complete", "package.json"))).
+      merge({
+        "dependencies" => packages.map(&:dependency).reduce(:merge)
+      })
+  ) + "\n"
+)
+
+# Write readme
+File.write(
+  File.join("..", "complete", "README.md"),
+  documentation + "\n" + packages.map(&:readme).join("\n") + "\n"
+)
+
+# Write index.js
+File.write(
+  File.join("..", "complete", "index.js"),
+  packages.map(&:import).join("\n") + "\n"
+)
+
+# Write website
+File.write(
+  File.join("..", "unctionjs.github.io", "index.md"),
+  "{% raw %}" + "\n" + documentation + "\n" + packages.map(&:readme).join("\n") + "\n" + "{% endraw %}" + "\n"
+)

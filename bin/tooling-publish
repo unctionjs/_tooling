@@ -1,0 +1,15 @@
+#!/usr/bin/env ruby
+
+require_relative "../source/tooling"
+
+include Tooling::Context::Active
+
+Tooling.command
+
+with(concurrent: false) do |name|
+  if name != "_tempLate" && different_version_from_published?(name) && ci_passes?(name)
+    puts "Publishing #{name}..."
+
+    `cd ../#{name} && npm publish`
+  end
+end

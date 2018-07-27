@@ -1,0 +1,10 @@
+#!/usr/bin/env ruby
+require_relative "../source/tooling"
+
+include Tooling::Context::Active
+
+Tooling.command
+
+with do |name|
+  `cd ../ && hub clone unctionjs/#{name}`
+end

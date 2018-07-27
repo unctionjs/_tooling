@@ -1,0 +1,35 @@
+#!/usr/bin/env ruby
+
+require "pry"
+require_relative "../source/tooling"
+
+Tooling.command
+
+paths = Dir[File.join("bin", "tooling-*")]
+commands = paths.map do |path|
+  {
+    name: path.split("/").last.split("-").drop(1).join("-"),
+    help: `ruby #{path} --help`
+  }
+end
+readmes = commands.map do |metadata|
+  <<~README
+  ## #{metadata[:name]}
+
+  ```
+
+  #{metadata[:help]}
+  ```
+
+  README
+end
+
+header = <<~HEADER
+# tooling tooling
+
+This is a list of all the tools available for managing all tooling packages. The only repository that blurs the line is `_tempLate`, which is a metapackage that we also want to maintain the same way.
+
+
+HEADER
+
+File.write("README.md", header + readmes.join)

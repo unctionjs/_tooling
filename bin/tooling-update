@@ -1,0 +1,42 @@
+#!/usr/bin/env ruby
+
+require_relative "../source/tooling"
+
+include Tooling::Context::Active
+
+Tooling.command do |let|
+  let.string "--name", "the name or pattern of a dependency"
+  let.bool "--single", "Use to completely force a single update", default: false
+  let.string "--type", "dependencies, devDependencies, peerDependencies, etc", default: "dependencies"
+end
+
+pattern = Regexp.new(Tooling.options["name"]) unless Tooling.options["single"]
+
+puts "Matching against #{pattern}"
+
+with do |name|
+  if Tooling.options["single"]
+    `cd ../#{name} && npm install --no-progress #{Tooling.options["name"]}@latest`
+  else
+    puts "#{dependencies.count} dependencies"
+    unless dependencies.empty?
+      puts "#{outdated_dependencies.count} dependencies outdated_dependencies"
+
+      unless outdated_dependencies.grep(pattern).empty?
+        outdated_dependencies.
+          grep(pattern).
+          join(" ").
+          tap do |list|
+            case Tooling.options["type"]
+            when "dependencies"
+              `cd ../#{name} && npm install --no-progress --save #{list}`
+            when "devDependencies"
+              `cd ../#{name} && npm install --no-progress --save-dev #{list}`
+            when "peerDependencies"
+              `cd ../#{name} && npm install --no-progress --save-peer #{list}`
+            end
+          end
+      end
+    end
+  end
+end
