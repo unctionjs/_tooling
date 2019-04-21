@@ -4,8 +4,11 @@ require_relative "../source/tooling"
 
 include Tooling::Context::Active
 
-Tooling.command
+Tooling.command do |let|
+  let.boolean "--rebase", default: false
+  let.string "--branch", "what branch to push", default: "core"
+end
 
-with do |name|
-  `cd ../#{name} && git pull`
+with(concurrent: true) do |name|
+  `cd ../#{name} && git pull #{if Tooling.options["rebase"] then "--rebase" end} origin #{Tooling.options["branch"]}`
 end

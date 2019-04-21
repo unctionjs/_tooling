@@ -10,7 +10,9 @@ documentation = File.read(File.join("data", "README.md"))
 packages = noncomplete.map do |name|
   metadata = Oj.load(File.read(File.join("..", name, "package.json")))
   {
-    import: "export {default as #{name}} from \"#{metadata["name"]}\"",
+    export: %(export {default as #{name}} from "#{metadata["name"]}"),
+    import: %(import {#{name}} from "./"),
+    test: %(test("#{name} is a function", ({type: assertType, end}) => {\n  assertType(#{name}, Function);\n  end();\n});),
     readme: File.read(File.join("..", name, "README.md")).
       gsub(/^# @unction.+$/, "### [#{name}](https://github.com/unctionjs/#{name}#readme)()").
       gsub(/^> (.+)/, "```\n\\1\n```").
@@ -20,7 +22,7 @@ packages = noncomplete.map do |name|
   }
 end.map(&OpenStruct.method(:new))
 
-# Write dependencies
+puts("Writing dependencies")
 File.write(
   File.join("..", "complete", "package.json"),
   JSON.pretty_generate(
@@ -31,19 +33,25 @@ File.write(
   ) + "\n"
 )
 
-# Write readme
+puts("Writing readme")
 File.write(
   File.join("..", "complete", "README.md"),
   documentation + "\n" + packages.map(&:readme).join("\n") + "\n"
 )
 
-# Write index.js
+puts("Writing index.js")
 File.write(
   File.join("..", "complete", "index.js"),
-  packages.map(&:import).join("\n") + "\n"
+  packages.map(&:export).join("\n") + "\n"
 )
 
-# Write website
+puts("Writing test.js")
+File.write(
+  File.join("..", "complete", "test.js"),
+  %(import {test} from "tap";\n#{packages.map(&:import).join(";\n")};\n\n#{packages.map(&:test).join("\n\n")}\n)
+)
+
+puts("Writing website")
 File.write(
   File.join("..", "unctionjs.github.io", "index.md"),
   "{% raw %}" + "\n" + documentation + "\n" + packages.map(&:readme).join("\n") + "\n" + "{% endraw %}" + "\n"

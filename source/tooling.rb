@@ -15,6 +15,10 @@ module Tooling
     @interface ||= HighLine.new
   end
 
+  def self.logger(text)
+    STDOUT.puts(text)
+  end
+
   def self.options
     @options
   end

@@ -5,9 +5,15 @@ require_relative "../source/tooling"
 include Tooling::Context::Active
 
 Tooling.command do |let|
+  let.boolean "--hard", "remove from fs", default: false
   let.array "--paths", "the list of files", required: true
+  let.boolean "--force", "force remove", required: false, default: false
 end
 
 with do |name|
-  `cd ../#{name} && git rm -r #{Tooling.options["paths"].join(" ")}; rm -r #{Tooling.options["paths"].join(" ")}`
+  if Tooling.options["hard"]
+    `cd ../#{name} && rm -#{if Tooling.options["force"] then "f" end}r #{Tooling.options["paths"].join(" ")}`
+  else
+    `cd ../#{name} && git rm #{if Tooling.options["force"] then "--force" end} -r #{Tooling.options["paths"].join(" ")}`
+  end
 end

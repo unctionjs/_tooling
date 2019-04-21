@@ -4,9 +4,11 @@ require_relative "../source/tooling"
 
 include Tooling::Context::Active
 
-Tooling.command
+Tooling.command do |let|
+  let.boolean "--amend", default: false
+end
 
 with(concurrent: false) do |name|
   raise ArgumentError, "must supply MESSAGE=" unless ENV["MESSAGE"]
-  system("cd ../#{name} && git commit --amend -m \"#{ENV["MESSAGE"]}\"")
+  system("cd ../#{name} && git commit #{if Tooling.options["ammend"] then "--amend" end} -m \"#{ENV["MESSAGE"]}\"")
 end

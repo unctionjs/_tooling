@@ -3,19 +3,19 @@ module Tooling
     require_relative "context/active"
 
     private def with(concurrent: true, &work)
-      pool = Concurrent::FixedThreadPool.new(3)
+      pool = Concurrent::FixedThreadPool.new(4)
 
       names.each do |name|
         @package = Tooling::Package.new(name)
 
         if concurrent
           pool.post do
-            puts "Inside #{name}..."
+            Tooling.logger "Inside #{name}..."
 
             work.call(name)
           end
         else
-          puts "Inside #{name}..."
+          Tooling.logger "Inside #{name}..."
 
           work.call(name)
         end

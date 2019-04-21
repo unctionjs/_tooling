@@ -6,7 +6,7 @@ include Tooling::Context::Active
 
 Tooling.command do |let|
   let.string "--name", "the name or pattern of a dependency"
-  let.bool "--single", "Use to completely force a single update", default: false
+  let.boolean "--single", "Use to completely force a single update", default: false
   let.string "--type", "dependencies, devDependencies, peerDependencies, etc", default: "dependencies"
 end
 

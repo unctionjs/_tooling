@@ -1,0 +1,29 @@
+#!/usr/bin/env ruby
+require 'tempfile'
+require_relative "../source/tooling"
+
+include Tooling::Context::Active
+
+Tooling.command do |let|
+  let.boolean "--concurrent", default: false
+  let.boolean "--dry", default: false
+  let.string "--file", required: true
+  let.string "--pattern", required: true
+  let.string "--replacement", required: true
+end
+
+with(concurrent: Tooling.options["concurrent"]) do |name|
+  input = File.read(File.join("..", name, Tooling.options["file"]))
+  matches = input.match(Regexp.new(Tooling.options["pattern"]))
+  output = input.gsub(Regexp.new(Tooling.options["pattern"]), Tooling.options["replacement"])
+
+  if Tooling.options["dry"]
+    Tooling.logger "Pattern: #{Tooling.options["pattern"]}"
+    Tooling.logger "Matches: \n\t- #{matches.to_a.join("\n\t - ")}"
+    before = Tempfile.new("before").tap {|file| file.write(input) && file.close}.path
+    after = Tempfile.new("after").tap {|file| file.write(output) && file.close}.path
+    Tooling.logger(%x(git diff --no-renames #{before} #{after} | diff-so-fancy) + "\n")
+  else
+    File.write(File.join("..", name, Tooling.options["file"]), output)
+  end
+end
