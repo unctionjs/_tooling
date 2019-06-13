@@ -3,9 +3,7 @@ isIterable
 isFunctor
 iterateFunction
 keyChain
-keys
 recordFrom
 selectValues
 cascadingKeyChain
 recordFromEntity
-exceptKey

@@ -4,73 +4,103 @@ require_relative "../source/tooling"
 
 include Tooling::Context::Active
 
+def message(text, level, scope)
+  puts("  " * level + "[#{scope}] " + text)
+end
+
+def execute(command)
+  puts(command)
+  system(command) unless ENV["DRY"]
+end
+
 Tooling.command do |let|
   let.string "--root", "the root package you want to start with", default: "complete"
 end
 
-@visited = []
-@level = 0
+def pull_latest_from_github(package, level, scope)
+  message("🐱 pulling #{package.name}@core and tags from github", level, scope)
+  execute("cd ../#{package.name} && git pull origin core")
+end
 
-def update_children_of(package)
+def push_latest_to_github(package, level, scope)
+  message("🐱 pushing #{package.name}@core and tags to github", level, scope)
+  execute("cd ../#{package.name} && git push --tags origin core")
+end
+
+def publish_missing_versions(package, level, scope)
+  published = package.npm_versions.map { |version| "v#{version}" }
+  tagged = `cd ../#{package.name} && git tag | xargs`.chomp.split(" ")
+
+  (tagged - published).each do |tag|
+    message("🆙 backfilling #{package.name}@#{tag} to npm", level, scope)
+    execute("cd ../#{package.name} && git checkout #{tag} && npm publish")
+  end
+
+  execute("cd ../#{package.name} && git checkout core")
+
+  message("📡 setting #{package.name}@latest to #{package.current_version}", level, scope)
+  execute("cd ../#{package.name} && npm dist-tag add @unction/#{package.name.downcase}@#{package.npm_latest_version} latest")
+end
+
+
+def update_unction_dependencies(package, level, scope)
+  message("👮‍ Looking for any outdated dependencies", level, scope)
+  outdated_unction_packages = package.
+    outdated_dependencies.
+    map {|dependency| "#{dependency.fullname}@latest"}.
+    grep(/^@unction/)
+
+  message("ℹ️ Out of #{package.dependencies.length} packages #{outdated_unction_packages.length} are outdated!", level, scope)
+
+  if outdated_unction_packages.any?
+    message("📩 updating #{outdated_unction_packages.join(" ")}", level, scope)
+    execute("cd ../#{package.name} && npm install --no-progress --save #{outdated_unction_packages.join(" ")} > /dev/null")
+
+    message("✍️ adding package.json and package-lock.json", level, scope)
+    execute("cd ../#{package.name} && git add package.json package-lock.json > /dev/null")
+
+    message("💾 committing changes", level, scope)
+    execute("cd ../#{package.name} && git commit -m 'Upgrading @unction dependencies to latest' > /dev/null")
+  end
+end
+
+def make_new_release(package, level, scope)
+  return message("⏱ nothing new to publish", level, scope) unless package.different_from_last_tag?
+
+  message("👊 upgrading #{package.name} (minor) to version #{package.current_version}", level, scope)
+  execute("cd ../#{package.name} && npm version minor > /dev/null")
+
+  message("🌎 publishing #{package.name}@#{package.current_version} to npm", level, scope)
+  execute("cd ../#{package.name} && npm publish > /dev/null")
+
+  message("📡 setting #{package.name}@latest to #{package.current_version}", level, scope)
+  execute("cd ../#{package.name} && npm dist-tag add @unction/#{package.name.downcase}@#{package.npm_latest_version} latest")
+end
+
+def update_children_of(package, level)
   return if package.name == "_tempLate"
-
+  message("👁 updating children", level, package.name)
 
   if @visited.include?(package.name)
-    puts "skipping #{package.name}"
-    return
+    return message("⚠️ skipping", level + 1, package.name)
   end
 
   @visited << package.name
 
-  if package.dependencies.any?
-    package.dependencies.each do |dependency|
-      update_children_of(dependency)
-    end
+  return message("⚠️ no packages", level + 1, package.name) unless package.dependencies.any?
 
-    puts "visiting #{package.name}"
-    puts "  - 🕰 checking for outdated dependencies"
-    outdated = package.
-      outdated_dependencies.
-      map {|dependency| "#{dependency.fullname}@latest"}.
-      grep(/^@unction\/.+/)
-
-    if outdated.any?
-      list = outdated.join(" ")
-
-      `cd ../#{package.name} && npm install --no-progress --save #{list} > /dev/null`
-      puts "  - 📩 updating #{list}"
-
-      `cd ../#{package.name} && git add package.json package-lock.json > /dev/null`
-      puts "  - ✍️ adding package.json and package-lock.json"
-
-      `cd ../#{package.name} && git commit -m "[ignore] cascading upgrade" > /dev/null`
-      puts "  - 💾 committing changes"
-
-      if package.different_from_last_tag?
-        if package.ci_passes?
-          puts `cd ../#{package.name} && git diff #{package.latest_tagged_version}`
-          `say "Time to choose, Kurtis."`
-          breakage = Tooling.interface.ask("How much did you break? (major, minor, patch)")
-          `cd ../#{package.name} && npm version #{breakage} > /dev/null`
-          puts "  - 👊 upgraded to version #{package.current_version} (#{breakage} bump)"
-        else
-          puts "  - ✋ ci did not pass"
-        end
-
-        if package.different_version_from_published?
-          `cd ../#{package.name} && npm publish > /dev/null`
-          puts "  - 🌎 publishing to npm"
-        else
-          puts "  - 🛑 could not publish"
-        end
-      else
-        puts "  - ⏱ already published this version"
-      end
-
-      `cd ../#{package.name} && git push origin core &> /dev/null`
-      puts "  - 😸 pushing to github"
-    end
+  package.dependencies.each do |dependency|
+    update_children_of(dependency, level + 1)
   end
+
+  message("🕰 checking for outdated dependencies", level + 1, package.name)
+
+  pull_latest_from_github(package, level, package.name)
+  update_unction_dependencies(package, level, package.name)
+  make_new_release(package, level, package.name)
+  push_latest_to_github(package, level, package.name)
+  publish_missing_versions(package, level, package.name)
 end
 
-update_children_of(Tooling::Package.new(Tooling.options["root"]))
+@visited = []
+update_children_of(Tooling::Package.new(Tooling.options["root"]), 1)

@@ -10,12 +10,12 @@ template = File.join("..", "_tempLate")
 files = [
   ".babelrc",
   ".eslintrc.js",
-  ".gitignore",
-  ".gitmodules",
-  ".tool-versions",
-  ".travis.yml",
-  "CONDUCT.md",
-  "LICENSE"
+  # ".gitignore",
+  # ".gitmodules",
+  # ".tool-versions",
+  # ".travis.yml",
+  # "CONDUCT.md",
+  # "LICENSE"
 ]
 
 with(concurrent: true) do |name|
@@ -28,13 +28,13 @@ with(concurrent: true) do |name|
   original = JSON.parse(File.read(File.join(template, "package.json")))
   old = JSON.parse(File.read(File.join("..", name, "package.json")))
   updated = old.merge({
-    "contributors" => original["contributors"],
-    "license" => original["license"],
+    # "contributors" => original["contributors"],
+    # "license" => original["license"],
     "scripts" => original["scripts"],
     "main" => original["main"],
     "module" => original["module"],
     "browser" => original["browser"],
-    "nyc" => original["nyc"],
+    # "nyc" => original["nyc"],
     "files" => original["files"],
   })
   File.write(File.join("..", name, "package.json"), JSON.pretty_generate(updated) + "\n")

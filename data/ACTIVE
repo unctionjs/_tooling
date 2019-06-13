@@ -11,6 +11,7 @@ attach
 catchP
 compact
 complete
+compose
 computedProp
 couple
 dig
@@ -21,6 +22,7 @@ dropLast
 endsWith
 equals
 everyP
+exceptKey
 first
 flatten
 flattenTree
@@ -48,6 +50,7 @@ isPresent
 isType
 itself
 keyChainTree
+keys
 lacksText
 last
 length
@@ -67,6 +70,7 @@ mergeWithKey
 nestedApply
 objectFrom
 of
+onlyKeys
 optimisticP
 pairsKeys
 pairsValues
@@ -91,6 +95,7 @@ sampleSize
 selectByValue
 sequence
 shuffle
+sortBy
 splat
 split
 startsWith

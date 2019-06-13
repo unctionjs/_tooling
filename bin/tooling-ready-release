@@ -4,25 +4,25 @@ require_relative "../source/tooling"
 
 include Tooling::Context::Active
 
-Tooling.command("Automatically determine if and how to release")
+Tooling.command("Prepare a new release")
 
 with(concurrent: false) do |name|
-  # if package.ci_passes?
-    difference = `cd ../#{package.name} && git diff #{package.latest_tagged_version}`
-    next if difference.empty?
-    puts difference
+  if package.ci_passes?
+    puts `cd ../#{package.name} && git diff #{package.latest_tagged_version}`
+    `tput bel`
     breakage = Tooling.interface.ask("How much did you break? (major, minor, patch, skip)")
     unless breakage == "skip"
       `cd ../#{package.name} && npm version #{breakage} > /dev/null`
       puts "  - 👊 upgraded to version #{package.current_version} (#{breakage} bump)"
     end
-  # else
-  #   puts "  - ✋ ci did not pass"
-  # end
+  else
+    puts "  - ✋ ci did not pass"
+  end
 
   if package.different_version_from_published?
-    # code = Tooling.interface.ask("Enter the OTP:")  --otp=#{code}
-    `cd ../#{package.name} && npm publish > /dev/null`
+    `tput bel`
+    code = Tooling.interface.ask("Enter the OTP:")
+    `cd ../#{package.name} && npm publish --otp=#{code} > /dev/null`
     puts "  - 🌎 publishing to npm"
   else
     puts "  - 🛑 could not publish"
