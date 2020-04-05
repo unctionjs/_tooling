@@ -8,9 +8,11 @@ Tooling.command
 
 template = File.join("..", "_tempLate")
 files = [
-  ".babelrc",
-  ".eslintrc.js",
+  # ".babelrc",
+  # ".eslintrc.js",
   # ".gitignore",
+  # "tsconfig.json",
+  # "types.d.ts",
   # ".gitmodules",
   # ".tool-versions",
   # ".travis.yml",
@@ -18,24 +20,57 @@ files = [
   # "LICENSE"
 ]
 
-with(concurrent: true) do |name|
+with(concurrent: false) do |name|
   next if name == "_tempLate"
 
+  
   files.each do |file|
-    File.write(File.join("..", name, file), File.read(File.join(template, file)))
+    File.write(File.join("..", name, file), File.read(File.join(template, file)).gsub("{{NAME}}", name))
   end
 
-  original = JSON.parse(File.read(File.join(template, "package.json")))
-  old = JSON.parse(File.read(File.join("..", name, "package.json")))
-  updated = old.merge({
-    # "contributors" => original["contributors"],
-    # "license" => original["license"],
-    "scripts" => original["scripts"],
-    "main" => original["main"],
-    "module" => original["module"],
-    "browser" => original["browser"],
-    # "nyc" => original["nyc"],
-    "files" => original["files"],
-  })
+  # template = JSON.parse(File.read(File.join(template, "package.json")))
+  original = JSON.parse(File.read(File.join("..", name, "package.json")))
+
+  updated = [
+    "name",
+    "version",
+    "description",
+    "keywords",
+  ].reduce({}) do |accumulated, key|
+    accumulated.merge(key => original[key])
+  end.merge(
+    {
+      "license" => "SEE LICENSE IN LICENSE"
+    }.merge(
+      [
+        "homepage",
+        "repository",
+        "bugs",
+        "contributors",
+        "main",
+        "module",
+        "browser",
+        "types",
+        "files",
+        "sideEffects",
+        "scripts",
+      ].reduce({}) do |accumulated, key|
+        accumulated.merge(key => original[key])
+      end.merge({
+        "devDependencies" => original.fetch("devDependencies").transform_values do |value|
+          next value if value.nil?
+          next value unless value.match?(/^\d+\.\d+\.\d+$/)
+    
+          if value.match?(/^0\./)
+            value.split(".").first(2).push("x").join(".")
+          else
+            value.split(".").first(1).push("x").join(".")
+          end
+        end,
+        "dependencies" => original["dependencies"]
+      })
+    )
+  )
+
   File.write(File.join("..", name, "package.json"), JSON.pretty_generate(updated) + "\n")
 end

@@ -12,15 +12,15 @@ system [
   "hub clone unctionjs/_tempLate ../#{name}",
   "cd ../#{name}",
   "git remote remove origin",
-  "hub create unctionjs/#{name}",
+  # "hub create unctionjs/#{name}",
   "git submodule update --init"
 ].join(" && ")
 
 FILES = [
   "package.json",
-  "index.js",
+  "index.ts",
   "README.md",
-  "test.js",
+  "test.ts",
   "package.json",
 ]
 

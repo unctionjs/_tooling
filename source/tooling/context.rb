@@ -26,6 +26,11 @@ module Tooling
       pool.wait_for_termination
     end
 
+    def execute(command)
+      puts(command)
+      system(command) unless ENV["DRY"]
+    end
+
     private def file(name, path)
       File.read(File.join("..", name, path))
     end

@@ -1,3 +1,22 @@
+Add package.json:
+
+  "jest": {
+    "setupFilesAfterEnv": ["jest-extended"]
+  }
+
+Remove package.json
+
+  "nyc": {
+    ...
+  }
+
+setup @babel/plugin-syntax-dynamic-import
+
+Import eslint-plugin-jest rules
+
+---
+
+
 bin/tooling-remove --paths .flowconfig
 bin/tooling-rewrite
 bin/tooling-add --files .babelrc,.eslintrc.js,.gitignore,.tool-versions,package.json
@@ -488,3 +507,9 @@ npm ERR!     /Users/krainboltgreene/.npm/_logs/2019-04-14T04_15_48_310Z-debug.lo
 Inside withoutKeyRecursive...
 Inside zip...
 ```
+
+
+bin/tooling-each --concurrent --command "cd types/ && git pull origin core"
+bin/tooling-each --concurrent --command "npm install --save-dev @babel/preset-typescript typescript"
+bin/tooling-each --command "git mv index.js index.ts"
+bin/tooling-rewrite

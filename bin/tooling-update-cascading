@@ -32,8 +32,10 @@ def publish_missing_versions(package, level, scope)
   tagged = `cd ../#{package.name} && git tag | xargs`.chomp.split(" ")
 
   (tagged - published).each do |tag|
-    message("🆙 backfilling #{package.name}@#{tag} to npm", level, scope)
-    execute("cd ../#{package.name} && git checkout #{tag} && npm publish")
+    begin
+      message("🆙 backfilling #{package.name}@#{tag} to npm", level, scope)
+      execute("cd ../#{package.name} && git checkout #{tag} && npm publish")
+    end
   end
 
   execute("cd ../#{package.name} && git checkout core")

@@ -4,14 +4,20 @@ require_relative "../source/tooling"
 
 include Tooling::Context::Active
 
-Tooling.command("Automatically determine if and how to release")
+Tooling.command("Automatically determine if and how to release") do |let|
+  let.string "--bump", "mass set the bump"
+end
 
 with(concurrent: false) do |name|
   # if package.ci_passes?
     difference = `cd ../#{package.name} && git diff #{package.latest_tagged_version}`
     next if difference.empty?
     puts difference
-    breakage = Tooling.interface.ask("How much did you break? (major, minor, patch, skip)")
+    breakage = if Tooling.options["bump"]
+      Tooling.options["bump"]
+    else
+      Tooling.interface.ask("How much did you break? (major, minor, patch, skip)")
+    end
     unless breakage == "skip"
       `cd ../#{package.name} && npm version #{breakage} > /dev/null`
       puts "  - 👊 upgraded to version #{package.current_version} (#{breakage} bump)"

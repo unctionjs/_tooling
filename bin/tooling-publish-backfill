@@ -6,14 +6,23 @@ include Tooling::Context::Active
 
 Tooling.command
 
-with do |name|
+with(concurrent: false) do |name|
   next if name == "_tempLate"
 
-  published = Tooling::Package.new(name).npm_versions.map { |version| "v#{version}" }
-  tagged = `cd ../#{name} && git tag | xargs`.chomp.split(" ")
+  published = @package.npm_versions.map { |version| "v#{version}" }
+  tagged = `cd ../#{@package.name} && git tag | xargs`.chomp.split(" ")
 
   (tagged - published).each do |tag|
-    system("cd ../#{name} && git checkout #{tag} && npm publish")
+    begin
+      puts("🆙 backfilling #{@package.name}@#{tag} to npm")
+      execute("cd ../#{@package.name} && git checkout #{tag} && npm publish")
+    rescue
+      puts("! Failed")
+    end
   end
-  system("cd ../#{name} && git checkout core")
+
+  execute("cd ../#{@package.name} && git checkout core")
+
+  puts("📡 setting #{@package.name}@latest to #{@package.current_version}")
+  execute("cd ../#{@package.name} && npm dist-tag add @unction/#{@package.name.downcase}@#{@package.npm_latest_version} latest")
 end

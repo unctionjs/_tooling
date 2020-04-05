@@ -8,6 +8,8 @@ Tooling.command
 
 with(concurrent: false) do |name|
   unless name == "_tempLate"
-    `cd ../#{name} && npm run ci`
+    system("cd ../#{name} && npm run typecheck 2>&1")
+    system("cd ../#{name} && npm run test 2>&1")
+    system("cd ../#{name} && npm run lint 2>&1")
   end
 end

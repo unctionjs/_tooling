@@ -10,13 +10,12 @@ documentation = File.read(File.join("data", "README.md"))
 packages = noncomplete.map do |name|
   metadata = Oj.load(File.read(File.join("..", name, "package.json")))
   {
-    export: %(export {default as #{name}} from "#{metadata["name"]}"),
-    import: %(import {#{name}} from "./"),
-    test: %(test("#{name} is a function", ({type: assertType, end}) => {\n  assertType(#{name}, Function);\n  end();\n});),
+    export: %(export {default as #{name}} from "#{metadata["name"]}";),
+    import: %(import {#{name}} from "./index";),
+    test: %(test("#{name} is a function", () => expect(#{name}).toBeInstanceOf(Function));),
     readme: File.read(File.join("..", name, "README.md")).
       gsub(/^# @unction.+$/, "### [#{name}](https://github.com/unctionjs/#{name}#readme)()").
       gsub(/^> (.+)/, "```\n\\1\n```").
-      gsub(/(\w+?)Type/, "\\1").
       gsub(/\|/, "\|"),
     dependency: {metadata["name"] => metadata["version"]}
   }
@@ -39,16 +38,16 @@ File.write(
   documentation + "\n" + packages.map(&:readme).join("\n") + "\n"
 )
 
-puts("Writing index.js")
+puts("Writing index.ts")
 File.write(
-  File.join("..", "complete", "index.js"),
+  File.join("..", "complete", "index.ts"),
   packages.map(&:export).join("\n") + "\n"
 )
 
-puts("Writing test.js")
+puts("Writing test.ts")
 File.write(
-  File.join("..", "complete", "test.js"),
-  %(import {test} from "tap";\n#{packages.map(&:import).join(";\n")};\n\n#{packages.map(&:test).join("\n\n")}\n)
+  File.join("..", "complete", "test.ts"),
+  %(#{packages.map(&:import).join("\n")}\n\n#{packages.map(&:test).join("\n\n")}\n)
 )
 
 puts("Writing website")
