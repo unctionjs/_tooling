@@ -114,3 +114,4 @@ where
 withoutKeyRecursive
 withoutKeys
 zip
+matchesRegExp

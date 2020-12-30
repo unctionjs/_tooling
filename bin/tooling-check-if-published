@@ -1,0 +1,21 @@
+#!/usr/bin/env ruby
+
+require_relative "../source/tooling"
+
+include Tooling::Context::Active
+
+Tooling.command
+
+with(concurrent: false) do |name|
+  next if name == "_tempLate"
+
+  published = @package.npm_versions.map { |version| "v#{version}" }
+  tagged = `cd ../#{@package.name} && git tag | xargs`.chomp.split(" ")
+  (tagged - published).each do |tag|
+    begin
+      puts("🆙 #{@package.name}@#{tag} needs filling!")
+    rescue
+      puts("! Failed")
+    end
+  end
+end

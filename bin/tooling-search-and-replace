@@ -4,14 +4,98 @@ require_relative "../source/tooling"
 
 include Tooling::Context::Active
 
+
+def replace(name:, file:, mapping:)
+  binding.pry if name == "pairsFrom"
+  File.write(File.join("..", name, file), mapping.to_a.reduce(File.read(File.join("..", name, file))) do |content, (input, output)|
+    content.gsub(
+      input,
+      output
+    )
+  end)
+end
+
 Tooling.command
 
 with(concurrent: true) do |name|
   next if name == "_tempLate"
 
-  original = File.read(File.join("..", name, "test.js"))
-  rewritten = original
-    .gsub(%(/* eslint-disable flowtype/require-return-type */), %())
-    .gsub(%(from "./index"), %(from "./"))
-  File.write(File.join("..", name, "test.js"), rewritten)
+  # replace(name: name, file: "package.json", mapping: {
+  #   %("types": "index.ts",,) => %("types": "index.ts",),
+  # })
+
+  # replace(name: name, file: "package.json", mapping: {
+  #   %(  "files": [\n    "index.ts",\n    "main.js",\n    "browser.js",\n    "types/*.d.ts"\n  ],) => %(  "files": [\n    "index.ts",\n    "main.js",\n    "module.js",\n    "browser.js"\n  ],),
+  #   %(  "files": [\n    "index.ts",\n    "main.js",\n    "module.js",\n    "browser.js",\n    "types/*.d.ts"\n  ],) => %(  "files": [\n    "index.ts",\n    "main.js",\n    "module.js",\n    "browser.js"\n  ],),
+  # })
+
+  # replace(name: name, file: "package.json", mapping: {
+  #   %("build": "npm run build:browser && npm run build:main") => %("build": "npm run build:browser && npm run build:main && npm run build:module"),
+  #   %("build:browser": "babel --env-name browser --out-file './browser.js' './index.ts'",\n) => %("build:browser": "babel --env-name browser --out-file './browser.js' './index.ts'",\n    "build:module": "babel --env-name module --out-file './module.js' './index.ts'",),
+  # })
+
+  # replace(name: name, file: "jest.config.js", mapping: {
+  #   %(setupTestFrameworkScriptFile: ".jest/setup.js",\n  ) => "",
+  # })
+
+  # replace(name: name, file: "tsconfig.json", mapping: {
+  #   /"strictNullChecks": true,\n/ => %(),
+  # })
+  mapping = {
+    %(KeyedEnumerableType<A, C | B>) => %(ListType<A> | RecordType<C | B, A> | TextType),
+    %(KeyedEnumerableType<A, B>) => %(ListType<A> | RecordType<B, A> | TextType),
+    %(KeyedEnumerableType<B, A>) => %(ListType<B> | RecordType<A, B> | TextType),
+    %(KeyedEnumerableType<R>) => %(ListType<R> | RecordType<unknown, R> | TextType),
+    %(KeyedEnumerableType<L>) => %(ListType<L> | RecordType<unknown, L> | TextType),
+    %(KeyedEnumerableType<V, K>) => %(ListType<V> | RecordType<K, V> | TextType),
+    %(KeyedEnumerableType<B, C>) => %(ListType<B> | RecordType<C, B> | TextType),
+    %(KeyedEnumerableType<[R, L]>) => %(ListType<[R, L]> | RecordType<unknown, [R, L]>),
+    %(OrderedEnumerableType<A | B>) => %(Array<A | B> | TextType),
+    %(OrderedEnumerableType<V>) => %(Array<V> | TextType),
+    %(OrderedEnumerableType<C>) => %(Array<C> | TextType),
+    %(UnorderedEnumerableType<V>) => %(Set<V> | ObjectType<V> | Map<unknown, V>),
+    %(EnumerableType<A>) => %(ListType<A> | RecordType<unknown, A> | TextType),
+    %(EnumerableType<A | null>) => %(ListType<A | null> | RecordType<unknown, A | null>),
+    %(EnumerableType<B>) => %(ListType<B> | RecordType<unknown, B> | TextType),
+    %(EnumerableType<C, D>) => %(RecordType<D, C>),
+    %(EnumerableType<A, B>) => %(RecordType<B, A>),
+    %(EnumerableType<C, B>) => %(RecordType<B, C>),
+    %(EnumerCbleType<B, A>) => %(RecordType<A, B>),
+    %(EnumerableType<A, C>) => %(RecordType<C, A>),
+    %(EnumerableType<V, K>) => %(RecordType<K, V>),
+    %(EnumerableType<B, C>) => %(RecordType<C, B>),
+    %(EnumerableType<Array<A> | Set<A> | Record<string | number | symbol, B> | Map<B, A> | string | A>) => %(ListType<Array<A> | Set<A> | Record<string | number | symbol, B> | Map<B, A> | string | A> | RecordType<unknown, Array<A> | Set<A> | Record<string | number | symbol, B> | Map<B, A> | string | A> | TextType),
+    %(EnumerableType<MapperFunctionType<A, B>>) => %(ListType<MapperFunctionType<A, B>> | RecordType<unknown, MapperFunctionType<A, B>>),
+    %(EnumerableType<MapperFunctionType<A, B>, C>) => %(ListType<MapperFunctionType<A, B>> | RecordType<C, MapperFunctionType<A, B>>),
+    %(ListType<A>) => %(Array<A> | Set<A>),
+    %(ListType<B>) => %(Array<B> | Set<B>),
+    %(ListType<MapperFunctionType<A, B>>) => %(Array<MapperFunctionType<A, B>> | Set<MapperFunctionType<A, B>>),
+    %(ObjectType<T>) => %(Record<string | number | symbol, T>),
+    %(ObjectType<V>) => %(Record<string | number | symbol, V>),
+    %(RecordType<unknown, A>) => %(Record<string | number | symbol, B> | Map<B, A>),
+    %(RecordType<unknown, MapperFunctionType<A, B>>) => %(Record<string | number | symbol, MapperFunctionType<A, B>> | Map<unknown, MapperFunctionType<A, B>>),
+    %(RecordType<A, B>) => %(Record<string | number | symbol, B> | Map<A, B>),
+    %(RecordType<K, V>) => %(Record<string | number | symbol, V> | Map<K, V>),
+    %(RecordType<B, A>) => %(Record<string | number | symbol, B> | Map<B, A>),
+    %(RecordType<B, unknown>) => %(Record<string | number | symbol, unknown> | Map<B, unknown>),
+    %(RecordType<D, C>) => %(Record<string | number | symbol, C> | Map<D, C>),
+    %(RecordType<C, A>) => %(Record<string | number | symbol, A> | Map<C, A>),
+    %(RecordType<C, B>) => %(Record<string | number | symbol, B> | Map<C, B>),
+    %(TextType) => %(string),
+  }
+  replace(name: name, file: "index.ts", mapping: mapping)
+
+  replace(name: name, file: "README.md", mapping: mapping)
+
+  replace(name: name, file: "index.ts", mapping: {
+    %(import {UnorderedEnumerableType} from "./types";) => %(),
+    %(import {KeyedEnumerableType} from "./types";) => %(),
+    %(import {OrderedEnumerableType} from "./types";) => %(),
+    %(import {EnumerableType} from "./types";) => %(),
+    %(import {ObjectType} from "./types";) => %(),
+    %(import {ListType} from "./types";) => %(),
+    %(import {RecordType} from "./types";) => %(),
+    %(import {TextType} from "./types";) => %(),
+    /\n{3,100}/ => %(\n\n),
+  })
 end

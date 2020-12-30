@@ -40,5 +40,5 @@ old = File.read(location).split("\n")
 updated = [*old, name].uniq.join("\n")
 
 File.write(location, updated)
-system("atom ../#{name}")
+system("code ../#{name}")
 system("open -a iTerm.app ../#{name}")

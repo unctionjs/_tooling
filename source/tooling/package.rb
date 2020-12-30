@@ -8,16 +8,20 @@ module Tooling
       @name = name
     end
 
+    def path
+      File.join("..", name)
+    end
+
     def ci_passes?
-      system("cd ../#{name} && npm run ci", out: "/dev/null")
+      system("cd #{path} && npm run ci", out: "/dev/null")
     end
 
     def different_from_last_tag?
-      `cd ../#{name} && git diff HEAD..#{latest_tagged_version}` != ""
+      `cd #{path} && git diff HEAD..#{latest_tagged_version}` != ""
     end
 
     def different_version_from_published?
-      npm_recent_version != packagefile["version"]
+      npm_recent_version != current_version
     end
 
     def npm_recent_version
@@ -37,38 +41,51 @@ module Tooling
     end
 
     def tagged_versions
-      `cd ../#{name}; git tag`.chomp.split("\n").sort_by { |version| version.gsub("v", "").split(".").map(&:to_i) }
+      `cd #{path}; git tag`.chomp.split("\n").sort_by { |version| version.gsub("v", "").split(".").map(&:to_i) }
     end
 
     def current_version
-      packagefile["version"]
+      package_property("version")
     end
 
     def packagefile
-      Oj.load(File.read(File.join("..", name, "package.json")))
+      Oj.load(File.read(File.join(path, "package.json")))
     end
 
-    def package_property(key)
-      packagefile.fetch(key)
+    def package_property(key, default = nil)
+      packagefile.fetch(key, default)
+    end
+
+    def unction_dependencies
+      dependencies.
+        select { |package| MAPPINGS.key?(package.name) }.
+        map { |package| MAPPINGS.fetch(package.name) }.
+        map(&Package.method(:new))
     end
 
     def dependencies
-      (packagefile.fetch("dependencies", {}) || {}).
+      (package_property("dependencies", {}) || {}).
         keys.
-        select { |name| MAPPINGS.key?(name) }.
-        map { |name| MAPPINGS.fetch(name) }.
         map(&Package.method(:new))
     end
-    memoize :dependencies
 
-    def outdated_dependencies
-      dependencies.
-        select {|dependency| `cd ../#{name} && npm outdated`.match?(/^#{dependency.fullname}/)}
+    def dev_dependencies
+      (package_property("devDependencies", {}) || {}).
+        keys.
+        map(&Package.method(:new))
     end
-    memoize :outdated_dependencies
+
+    def outdated_unction_dependencies
+      unction_dependencies.
+        select {|dependency| `cd #{path} && npm outdated`.match?(/^#{dependency.fullname}/)}
+    end
 
     def fullname
-      "@unction/#{name.downcase}"
+      "@unction/#{npm_name}"
+    end
+
+    def npm_name
+      name.downcase
     end
   end
 end

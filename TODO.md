@@ -1,3 +1,7 @@
+
+
+npm install --save-dev @babel/plugin-syntax-dynamic-import core-js && npm install --save-dev @babel/cli @babel/core @babel/plugin-proposal-object-rest-spread @babel/plugin-syntax-dynamic-import @babel/preset-env @babel/preset-typescript @babel/register @types/jest @types/node babel-eslint babel-jest babel-plugin-annotate-console-log babel-plugin-module-resolver babel-preset-minify core-js eslint eslint-import-resolver-babel-module eslint-plugin-babel eslint-plugin-jest eslint-plugin-promise jest jest-extended typescript && npm audit fix && npm prune && git add package.json package-lock.json
+
 Add package.json:
 
   "jest": {

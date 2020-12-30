@@ -1,9 +1,9 @@
 module Tooling
   module Context
-    module Active
+    module Nondead
       include Context
 
-      NAMES = File.read(File.join("data", "ACTIVE")).split("\n").uniq
+      NAMES = [*File.read(File.join("data", "ACTIVE")).split("\n"), *File.read(File.join("data", "PENDING")).split("\n")].uniq
       MAPPINGS = NAMES.reduce({}) do |mapping, name|
         mapping.merge("@unction/#{name.downcase}" => name)
       end

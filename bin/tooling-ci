@@ -7,9 +7,11 @@ include Tooling::Context::Active
 Tooling.command
 
 with(concurrent: false) do |name|
-  unless name == "_tempLate"
-    system("cd ../#{name} && npm run typecheck 2>&1")
-    system("cd ../#{name} && npm run test 2>&1")
-    system("cd ../#{name} && npm run lint 2>&1")
-  end
+  next if name == "_tempLate"
+  output = `cd ../#{name} && npm --silent run test 2>&1`
+  File.write(File.join("tmp", "ci", "#{name}_test.txt"), output) unless $?.success?
+  output = `cd ../#{name} && npm --silent run typecheck 2>&1`
+  File.write(File.join("tmp", "ci", "#{name}_typecheck.txt"), output) unless $?.success?
+  output = `cd ../#{name} && npm --silent run lint 2>&1`
+  File.write(File.join("tmp", "ci", "#{name}_lint.txt"), output) unless $?.success?
 end

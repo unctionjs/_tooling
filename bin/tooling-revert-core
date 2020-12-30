@@ -1,0 +1,9 @@
+#!/usr/bin/env ruby
+
+require_relative "../source/tooling"
+
+include Tooling::Context::Active
+
+with do |name|
+  `cd ../#{name} && git reset --hard origin/core`
+end

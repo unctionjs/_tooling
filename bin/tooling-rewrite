@@ -6,71 +6,69 @@ include Tooling::Context::Active
 
 Tooling.command
 
-template = File.join("..", "_tempLate")
-files = [
-  # ".babelrc",
-  # ".eslintrc.js",
-  # ".gitignore",
-  # "tsconfig.json",
-  # "types.d.ts",
-  # ".gitmodules",
-  # ".tool-versions",
-  # ".travis.yml",
-  # "CONDUCT.md",
-  # "LICENSE"
-]
+TEMPLATE = File.join("..", "_tempLate")
+
+def mutate_files(name:, copyable_files:, removed_files:)
+  copyable_files.each do |file|
+    File.write(File.join("..", name, file), File.read(File.join(TEMPLATE, file)).gsub("{{NAME}}", name))
+  end
+
+  removed_files.each do |file|
+    `rm #{File.join("..", name, file)}`
+  end
+end
 
 with(concurrent: false) do |name|
   next if name == "_tempLate"
 
-  
-  files.each do |file|
-    File.write(File.join("..", name, file), File.read(File.join(template, file)).gsub("{{NAME}}", name))
-  end
+  mutate_files(name: name, copyable_files: [
+    "tsconfig.json",
+  ], removed_files: [
+  ])
 
-  # template = JSON.parse(File.read(File.join(template, "package.json")))
-  original = JSON.parse(File.read(File.join("..", name, "package.json")))
+  # template = JSON.parse(File.read(File.join(TEMPLATE, "package.json")))
+  # original = JSON.parse(File.read(File.join("..", name, "package.json")))
 
-  updated = [
-    "name",
-    "version",
-    "description",
-    "keywords",
-  ].reduce({}) do |accumulated, key|
-    accumulated.merge(key => original[key])
-  end.merge(
-    {
-      "license" => "SEE LICENSE IN LICENSE"
-    }.merge(
-      [
-        "homepage",
-        "repository",
-        "bugs",
-        "contributors",
-        "main",
-        "module",
-        "browser",
-        "types",
-        "files",
-        "sideEffects",
-        "scripts",
-      ].reduce({}) do |accumulated, key|
-        accumulated.merge(key => original[key])
-      end.merge({
-        "devDependencies" => original.fetch("devDependencies").transform_values do |value|
-          next value if value.nil?
-          next value unless value.match?(/^\d+\.\d+\.\d+$/)
-    
-          if value.match?(/^0\./)
-            value.split(".").first(2).push("x").join(".")
-          else
-            value.split(".").first(1).push("x").join(".")
-          end
-        end,
-        "dependencies" => original["dependencies"]
-      })
-    )
-  )
+  # updated = [
+  #   "name",
+  #   "version",
+  #   "description",
+  #   "keywords",
+  # ].reduce({}) do |accumulated, key|
+  #   accumulated.merge(key => original[key])
+  # end.merge(
+  #   {
+  #     "license" => "SEE LICENSE IN LICENSE"
+  #   }.merge(
+  #     [
+  #       "homepage",
+  #       "repository",
+  #       "bugs",
+  #       "contributors",
+  #       "main",
+  #       "module",
+  #       "browser",
+  #       "types",
+  #       "files",
+  #       "sideEffects",
+  #       "scripts",
+  #     ].reduce({}) do |accumulated, key|
+  #       accumulated.merge(key => original[key])
+  #     end.merge({
+  #       "devDependencies" => original.fetch("devDependencies").transform_values do |value|
+  #         next value if value.nil?
+  #         next value unless value.match?(/^\d+\.\d+\.\d+$/)
 
-  File.write(File.join("..", name, "package.json"), JSON.pretty_generate(updated) + "\n")
+  #         if value.match?(/^0\./)
+  #           value.split(".").first(2).push("x").join(".")
+  #         else
+  #           value.split(".").first(1).push("x").join(".")
+  #         end
+  #       end,
+  #       "dependencies" => original["dependencies"]
+  #     })
+  #   )
+  # )
+
+  # File.write(File.join("..", name, "package.json"), JSON.pretty_generate(updated) + "\n")
 end

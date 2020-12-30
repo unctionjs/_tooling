@@ -1,6 +1,7 @@
 module Tooling
   module Context
     require_relative "context/active"
+    require_relative "context/nondead"
 
     private def with(concurrent: true, &work)
       pool = Concurrent::FixedThreadPool.new(4)

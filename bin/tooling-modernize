@@ -1,0 +1,88 @@
+#!/usr/bin/env ruby
+
+require_relative "../source/tooling"
+
+include Tooling::Context::Nondead
+
+TEMPLATE = File.join("..", "_tempLate")
+AUTOKEYS = [
+  "name",
+  "license",
+  "homepage",
+  "repository",
+  "bugs",
+  "contributors",
+  "main",
+  "module",
+  "browser",
+  "types",
+  "files",
+  "sideEffects",
+  "scripts",
+]
+
+Tooling.command
+
+def mass_copy(package:, files: [], folders: [])
+  files.each do |file|
+    library_file = File.join(package.path, file)
+    template_content = File.read(File.join(TEMPLATE, file))
+    File.write(library_file, template_content.gsub("{{NAME}}", package.name).gsub("{{NPM_NAME}}", package.npm_name))
+  end
+
+  folders.each do |folder|
+    FileUtils.cp_r(File.join(TEMPLATE, folder), package.path)
+  end
+end
+
+def mass_merge(package:, files: {})
+  files.each do |(file, mapping)|
+    original_file = File.join(package.path, file)
+    original_content = File.read(original_file)
+    File.write(original_file, mapping.(original_content))
+  end
+end
+
+with(concurrent: false) do |name|
+  return if name == "_tempLate"
+
+  mass_copy(
+    package: package,
+    folders: [
+      ".github/",
+    ],
+    files: [
+      ".eslintrc.js",
+      ".gitignore",
+      ".gitmodules",
+      ".tool-versions",
+      "babel.config.js",
+      "CONDUCT.md",
+      "jest.config.js",
+      "LICENSE",
+      "tsconfig.json",
+    ]
+  )
+
+  mass_merge(
+    package: package,
+    files: {
+      "package.json" => -> (original) {
+        original_json = Oj.load(original)
+        template_json = Oj.load(File.read(File.join(TEMPLATE, "package.json")))
+
+        new_json = AUTOKEYS.reduce(original_json) do |accumulated, key|
+          if template_json[key].kind_of?(String)
+            accumulated.merge(key => template_json[key].gsub("{{NAME}}", package.name).gsub("{{NPM_NAME}}", package.npm_name))
+          else
+            accumulated.merge(key => template_json[key])
+          end
+        end.merge({
+          "devDependencies" => original_json["devDependencies"].merge(template_json["devDependencies"])
+        })
+
+        Oj.dump(new_json)
+      }
+    }
+  )
+end

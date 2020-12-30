@@ -20,10 +20,10 @@ with do |name|
   else
     puts "#{dependencies.count} dependencies"
     unless dependencies.empty?
-      puts "#{outdated_dependencies.count} dependencies outdated_dependencies"
+      puts "#{outdated_unction_dependencies.count} dependencies outdated_unction_dependencies"
 
-      unless outdated_dependencies.grep(pattern).empty?
-        outdated_dependencies.
+      unless outdated_unction_dependencies.grep(pattern).empty?
+        outdated_unction_dependencies.
           grep(pattern).
           join(" ").
           tap do |list|

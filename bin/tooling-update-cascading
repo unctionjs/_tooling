@@ -48,11 +48,11 @@ end
 def update_unction_dependencies(package, level, scope)
   message("👮‍ Looking for any outdated dependencies", level, scope)
   outdated_unction_packages = package.
-    outdated_dependencies.
+    outdated_unction_dependencies.
     map {|dependency| "#{dependency.fullname}@latest"}.
     grep(/^@unction/)
 
-  message("ℹ️ Out of #{package.dependencies.length} packages #{outdated_unction_packages.length} are outdated!", level, scope)
+  message("ℹ️ Out of #{package.unction_dependencies.length} packages #{outdated_unction_packages.length} are outdated!", level, scope)
 
   if outdated_unction_packages.any?
     message("📩 updating #{outdated_unction_packages.join(" ")}", level, scope)
@@ -91,7 +91,7 @@ def update_children_of(package, level)
 
   return message("⚠️ no packages", level + 1, package.name) unless package.dependencies.any?
 
-  package.dependencies.each do |dependency|
+  package.unction_dependencies.each do |dependency|
     update_children_of(dependency, level + 1)
   end
 

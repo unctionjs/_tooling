@@ -10,6 +10,7 @@ Tooling.command
 
 RGL::DirectedAdjacencyGraph[
   *names.reduce([]) do |list, package|
+    # TODO: Convert to Package
     dependencies = (Oj.load(File.read(File.join("..", package, "package.json"))).fetch("dependencies", {}) || {}).keys
     unctions = dependencies.select {|dependency| dependency.match?(/^@unction/) }
     adjancent = unctions.map {|dependency| ["@unction/#{package.downcase}", dependency]}.flatten

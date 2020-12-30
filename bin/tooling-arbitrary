@@ -1,0 +1,13 @@
+#!/usr/bin/env ruby
+
+require_relative "../source/tooling"
+
+include Tooling::Context::Active
+
+Tooling.command
+
+with(concurrent: false) do |name|
+  return if name == "_tempLate"
+  `cd ../#{name} && npm install --save-dev @types/ramda` if @package.dependencies.any? do |subpackage| subpackage.name.include?("ramda") end
+  `cd ../#{name} && npm install --save-dev @types/ramda` if @package.dev_dependencies.any? do |subpackage| subpackage.name.include?("ramda") end
+end
